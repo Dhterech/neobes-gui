@@ -1,0 +1,25 @@
+<RCC>
+    <qresource prefix="/menu">
+        <file>res/menu/greetings.png</file>
+        <file>res/menu/logo.jpg</file>
+        <file>res/menu/what.png</file>
+        <file>res/menu/regchg.png</file>
+        <file>res/menu/emudown.png</file>
+        <file>res/menu/besproj.png</file>
+    </qresource>
+    <qresource prefix="/"/>
+    <qresource prefix="/editor/buttons">
+        <file>res/editor/buttons/circle.png</file>
+        <file>res/editor/buttons/cross.png</file>
+        <file>res/editor/buttons/left.png</file>
+        <file>res/editor/buttons/right.png</file>
+        <file>res/editor/buttons/shooriken.png</file>
+        <file>res/editor/buttons/square.png</file>
+        <file>res/editor/buttons/triangle.png</file>
+        <file>res/editor/buttons/star.png</file>
+        <file>res/editor/buttons/dot.png</file>
+        <file>res/editor/buttons/unknown.png</file>
+        <file>res/editor/buttons/ustar.png</file>
+        <file>res/editor/buttons/udot.png</file>
+    </qresource>
+</RCC>
