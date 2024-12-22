@@ -7,7 +7,9 @@
         <file>res/menu/emudown.png</file>
         <file>res/menu/besproj.png</file>
     </qresource>
-    <qresource prefix="/"/>
+    <qresource prefix="/">
+        <file>res/neobes.ico</file>
+    </qresource>
     <qresource prefix="/editor/buttons">
         <file>res/editor/buttons/circle.png</file>
         <file>res/editor/buttons/cross.png</file>

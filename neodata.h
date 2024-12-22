@@ -1,10 +1,13 @@
 #ifndef NEODATA_H
 #define NEODATA_H
 
+#include "audio/soundsystem.h"
+#include "data/ptr2struct.h"
+#include "data/ptr2stages.h"
+#include "io/ptr2reader.h"
+#include "io/emuinterfacer.h"
 #include "types.h"
-#include "suggest.h"
-#include "neosound.h"
-#include "stageinfo.h"
+
 #include <fstream>
 
 extern std::vector<e_soundboard_t> Soundboards;

@@ -1,6 +1,4 @@
 #include "neodata.h"
-#include "pcsx2util.h"
-#include "pcsx2reader.h" // FIXME: shouldnt be here
 
 std::vector<e_soundboard_t> Soundboards;
 std::vector<e_suggestrecord_t> Records;
@@ -17,6 +15,7 @@ bool SUBMode;
 QString logHistory;
 
 int subcount; // remove later
+QString modestage; // fixme: you can mix other stages info
 
 const int GAME_FRAMERATE[3] = {60, 50, 60};
 const int RESOURCE_LIST_BASE[3] = {0x1C49480, 0x1C46100, 0x1C598e80};
@@ -200,7 +199,7 @@ int neodata::LoadFromBes(QString fileName) {
     };
 
     if(rawFile.peek() != EOF) { // NeoBesms Extra data
-        Log("Found extra data on: " + rawFile.tellg());
+        Log("Found extra data on: " + QString::number(rawFile.tellg()));
         READ(tmpu32); ModeSize = tmpu32;
         if(ModeSize > 9) { // Extra scenes
             for(int i = 9; i < ModeSize; i++) loadScene();
@@ -216,10 +215,16 @@ int neodata::LoadFromBes(QString fileName) {
 }
 #undef READ
 
-int neodata::SaveToEmu() { // FIXME: not used for now
+int neodata::SaveToEmu() {
     if(!pcsx2reader::IsEmuOpen()) return 1;
-    if(Modes.size() == 0) pcxs2GetModelist(StageInfo.stagemodelistbase, ModeSize); // Project File doesn't have modes
-    try {pcsx2upload();} catch(...) { return 2; }
+    if(Modes.size() == 0 || modestage != StageInfo.name) { // If we don't have modes for this
+        pcxs2GetModelist(StageInfo.stagemodelistbase, ModeSize); // Project File doesn't have modes
+        modestage = StageInfo.name;
+    }
+    try {
+        bool result = pcsx2upload(Records, Modes, ModeCommands, StageInfo, VSMode, PALMode, SUBMode, OopsSize, ModeSize);
+        if(result == false) return 4;
+    } catch(...) { return 2; }
     return 0;
 }
 
@@ -238,11 +243,11 @@ int neodata::LoadFromEmu() {
 
     Log(" Status: Reading game lines...");
     try {
-    pcxs2GetModelist(StageInfo.stagemodelistbase, ModeSize);
-    pcsx2GetComBuffers();
-    pcsx2ParseComRecords();
-    //pcsx2GetSoundboards(hdlistbase, bdlistbase, numhd); // PINE Read Limit
-    //pcsx2GetKeytables(StageInfo.keytablebase, numhd, 0); // PINE Read Limit
+        pcxs2GetModelist(StageInfo.stagemodelistbase, ModeSize);
+        pcsx2GetComBuffers();
+        pcsx2ParseComRecords();
+        pcsx2GetSoundboards(hdlistbase, bdlistbase, numhd);
+        pcsx2GetKeytables(StageInfo.keytablebase, numhd, 0);
     } catch(...) { return 2; }
     return 0;
 }
@@ -255,12 +260,12 @@ int neodata::UploadOLMToEmu(QString fileName) {
 int neodata::DownloadOLMFromEmu(QString fileName, int size) {
     if(!pcsx2reader::IsEmuOpen()) return 1;
     rawFile.open(fileName.toUtf8(), std::ios_base::out | std::ios_base::binary);
-    if(!rawFile.is_open()) return 4;//GetLastError();
+    if(!rawFile.is_open()) return 4;
 
-    //char *boo = pcsx2GetOLM(int size);
     char boo[size];
-    pcsx2reader::readExtended(OLM_LINK_ADDRESS, boo, size);
+    pcsx2reader::read(OLM_LINK_ADDRESS, boo, size);
 
     rawFile.write(boo, size);
     rawFile.close();
+    return 0;
 }
