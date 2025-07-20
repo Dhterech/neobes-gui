@@ -668,8 +668,8 @@ void neobes::ALinkVariant(bool linkAll)
     if(linkId == -1) return; // User Cancel
 
     if(linkAll) {
-        for(e_suggestvariant_t &variant : Records[CurrentRecord].variants) {
-            variant.setLink(linkId);
+        for(int i = 0; i < 17; i++) {
+            if(i != CurrentVariant) Records[CurrentRecord].variants[i].setLink(linkId);
         }
     } else {
         if(linkId == CurrentVariant) {
