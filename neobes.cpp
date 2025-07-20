@@ -98,6 +98,7 @@ neobes::neobes(QWidget *parent)
 
     connect(ui->selregBtn, &QPushButton::clicked, this, &neobes::ASelectRegion);
 
+    connect(ui->actionChangeMenu, &QAction::triggered, this, &neobes::changeMenu);
     connect(ui->actionLoad, &QAction::triggered, this, &neobes::ALoadProject);
     connect(ui->actionSave, &QAction::triggered, this, &neobes::ASaveProject);
 
@@ -143,16 +144,7 @@ neobes::neobes(QWidget *parent)
 
 /* Editor Keyboard Input */
 void neobes::keyPressEvent(QKeyEvent *event)
-{    
-    // Escape function
-    if(event->key() == Qt::Key_Escape && Records.size() != 0) {
-        isMenu = !isMenu;
-
-        if(isMenu) drawMenuGUI();
-        else drawEditorGUI();
-        return;
-    }
-
+{
     if(ui->stackedWidget->currentIndex() == 1) { // Only get keys when in editor
         switch(event->key()) {
         /* Moving cursor */
@@ -382,8 +374,19 @@ void neobes::AAboutGUI() {
 
 /* GUI Core Methods */
 
+void neobes::changeMenu() {
+    if(Records.size() != 0) {
+        isMenu = !isMenu;
+        ui->actionChangeMenu->enabledChanged(true);
+
+        if(isMenu) drawMenuGUI();
+        else drawEditorGUI();
+    }
+}
+
 void neobes::drawMenuGUI() {
     ui->stackedWidget->setCurrentIndex(0);
+    ui->actionChangeMenu->setText("Go to Editor");
 }
 
 QString drawRecord(int owner, int start, int length, int interval, int cursorPos) {
@@ -498,6 +501,7 @@ void neobes::drawInfo() {
 
 void neobes::drawEditorGUI() {
     ui->stackedWidget->setCurrentIndex(1);
+    ui->actionChangeMenu->setText("Go to Menu");
     drawCommands();
     QString textGUI = Records[CurrentRecord].variants[CurrentVariant].islinked ? QString("Linked to %1<br>").arg(Records[CurrentRecord].variants[CurrentVariant].linknum) : "<br>";
     updateLog();

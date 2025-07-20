@@ -24,6 +24,7 @@ public:
     ~neobes();
 
 private slots:
+    void changeMenu();
     void handleDisplayClick();
     void handleButtonKeys(int buttonId);
     void handleWasdKeys(bool lr, int inc);

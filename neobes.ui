@@ -718,6 +718,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <addaction name="actionDownloadOLM"/>
     <addaction name="actionDownloadEmu"/>
     <addaction name="actionUploadEmu"/>
+    <addaction name="separator"/>
+    <addaction name="actionChangeMenu"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
@@ -868,6 +870,20 @@ li.checked::marker { content: &quot;\2612&quot;; }
    </property>
    <property name="shortcut">
     <string>Shift+P</string>
+   </property>
+  </action>
+  <action name="actionChangeMenu">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::DocumentProperties"/>
+   </property>
+   <property name="text">
+    <string>Show Menu</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggles between Menu and Editor interface.</string>
+   </property>
+   <property name="shortcut">
+    <string>Esc</string>
    </property>
   </action>
  </widget>
