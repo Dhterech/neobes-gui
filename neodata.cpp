@@ -23,6 +23,7 @@ const int CURRENT_STAGE[3] = {0x386930, 0x1C63A74, 0x396DCC};
 
 void neodata::Log(QString string) {
     logHistory += string + "\n";
+    qDebug() << string;
 }
 
 void neodata::CloseProject() {

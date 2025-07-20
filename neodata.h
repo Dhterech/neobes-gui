@@ -10,6 +10,8 @@
 
 #include <fstream>
 
+#include <QDebug>
+
 extern std::vector<e_soundboard_t> Soundboards;
 extern std::vector<e_suggestrecord_t> Records;
 extern std::vector<std::vector<commandbuffer_t>> ModeCommands;
