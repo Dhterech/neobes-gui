@@ -324,10 +324,20 @@ void neobes::ADownloadOLM()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save Downloaded OLM"), "", tr("Overlay Module (*.OLM)"));
     if(fileName == "") return; // User Cancel
-    int size = QInputDialog::getInt(this, tr("Type the OLM file size"), tr("Type file size"), 0, 0, 50000); // FIXME: IPC LIMIT Size
+    int size = QInputDialog::getInt(this, tr("Type the OLM file size"), tr("Type file size"), 0, 0, 52428800);
     if(size == -1) return; // User Cancel
 
-    neodata::DownloadOLMFromEmu(fileName, size);
+    switch(neodata::DownloadOLMFromEmu(fileName, size)) {
+    case 1:
+        QMessageBox::critical(this, "Error on download", "NeoBES caused an error while downloading to PCSX2.");
+        break;
+    case 0:
+        QMessageBox::information(this, "Success on download", "The OLM File was downloaded successfully.");
+        break;
+    case 2:
+        QMessageBox::critical(this, "Error on upload", "PCSX2 wasn't found! Please verify that you're using PCSX2 Nightly with PINE enabled.");
+        break;
+    };
 }
 
 void neobes::AUploadOLM()
