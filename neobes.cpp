@@ -350,7 +350,15 @@ void neobes::AUploadOLM()
 /* REGION SELECT */
 
 void neobes::ASelectRegion() {
-    CurrentRegion = QInputDialog::getInt(this, tr("Region select"), tr("Type the region (0 = NTSC-U, 1 = PAL, 2 = NTSC-J"), CurrentRegion, 0, 2);
+    QInputDialog regionPicker;
+    QStringList regionList;
+    regionList << "NTSC-U" << "PAL" << "NTSC-J";
+
+    regionPicker.setOptions(QInputDialog::UseListViewForComboBoxItems);
+    regionPicker.setComboBoxItems(regionList);
+    regionPicker.setWindowTitle("Region select");
+    regionPicker.setLabelText("Select the region");
+    CurrentRegion = regionPicker.exec();
 }
 
 /* ABOUT */
