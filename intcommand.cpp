@@ -2,28 +2,10 @@
 
 QString modesSingleP[] = {"Cool", "Good", "Bad", "Awful", "Cooler", "Less cool", "Better", "Worse"};
 
-QString job_setup_owners[] = {"Teacher", "PaRappa", "BoxxyBoi", "Special"};
+QString job_setup_owners[] = {"Unknown", "None", "Teacher", "PaRappa", "BoxxyBoi", "Special"};
 QString job_setup_icon[] = {"Nothing", "PaRappa", "Boxxy", "Beard B.", "Master Onion", "Ant", "Sister Moosesha", "Takoyama", "Takoyama", "Colonel Noodle", "Mushi", "White fog", "Orange line", "Blue line"};
 
 QString subjob_displaylr[] = {"Lesson 1", "Lesson 2", "Lesson 3", "Lesson 4", "Lesson 5", "Round 1", "Round 2", "Round 3", "Round 4", "Round 5"};
-
-/*QString jobCommands[] = {
-    "SETUP",                   // 0x0
-    "LOAD_PLAY_RECORD",        // 0x1
-    "SCORE",                   // 0x2
-    "SCENE_BETTER",            // 0x3 (Check for accuracy)
-    "SCENE_COOLER",            // 0x4 (Check for accuracy)
-    "SCENE_OOPS",              // 0x5 (Check for accuracy)
-    "SCENE_WORSE",             // 0x6 (Check for accuracy)
-    "RETURN",                  // 0x7
-    "END_STAGE",               // 0x8
-    "RUN_SUBJOB",              // 0x9
-    "",                        // 0xA (No entry for this value)
-    "SCENE_UNKB",              // 0xB (Probably VS)
-    "SCENE_UNKC",              // 0xC (Probably VS)
-    "SCENE_UNKD",              // 0xD (Probably VS)
-    "SCENE_UNKE",              // 0xE (Probably VS)
-};*/
 
 QString jobCommands[] = {
     "SCRRJ_PLY",               // 0x0
@@ -98,7 +80,7 @@ void intcommand::handlePointer(GUICommand &gui, int pointer) {
 
 GUICommand intcommand::ConvertToGUI(commandbuffer_t command) {
     GUICommand gui;
-    if(command.arg1 >= 0 && command.arg1 <= 17) {
+    if(command.arg1 >= 0 || command.arg1 <= 17) {
         gui.commandType = jobCommands[command.cmd_id];
     } else {
         gui.commandType = "UNKNOWN JOB";
@@ -107,26 +89,29 @@ GUICommand intcommand::ConvertToGUI(commandbuffer_t command) {
     switch(command.cmd_id) {
     case 00: // "SETUP";
         gui.arg1 = "OWNER: ";
-        switch(command.arg1) {
-        case 0x02:
-            gui.arg1 += job_setup_owners[0]; break;
-        case 0x04:
-            gui.arg1 += job_setup_owners[1]; break;
-        case 0x08:
-            gui.arg1 += job_setup_owners[2]; break;
-        case 0x10:
-            gui.arg1 += job_setup_owners[3]; break;
-        }
+
+        if(gui.arg1.toInt() == 0x02) gui.arg1 += job_setup_owners[1] + " ";
+        if(gui.arg1.toInt() == 0x04) gui.arg1 += job_setup_owners[2] + " ";
+        if(gui.arg1.toInt() == 0x08) gui.arg1 += job_setup_owners[3] + " ";
+        if(gui.arg1.toInt() == 0x10) gui.arg1 += job_setup_owners[4] + " ";
+        if(gui.arg1.toInt() == 0) gui.arg1 = job_setup_owners[0];
+
         gui.arg2 = "ICON: " + job_setup_icon[command.arg2];
         gui.arg4 = "TIME: " + QString::number(command.arg4);
-
         break;
-    case 1:
-        gui.commandType = "LOAD_PLAY_RECORD";
+    case 1: // "LOAD_PLAY_RECORD";
         gui.arg4 = "TODO: Pointer";
         break;
-    case 2: // "SCORE"; "SCENE_BETTER"; "SCENE_COOLER"; "SCENE_OOPS"; "SCENE_WORSE";
-        handleSceneCommand(gui, command.arg1, command.arg4);
+    case 2: // "SCORE"
+        gui.arg1 = "RANK: " + modesSingleP[command.arg1];
+        gui.arg4 = "VSPLAYER: " + job_setup_owners[command.arg4];
+        break;
+    case 3: // "SCENE_BETTER";
+    case 4: // "SCENE_COOLER";
+    case 5: // "SCENE_OOPS";
+    case 6: // "SCENE_WORSE";
+        gui.arg1 = "RANK: " + modesSingleP[command.arg1];
+        gui.arg4 = "TIME: " + QString::number(command.arg4);
         break;
     case 7:
     case 8: // "RETURN"; "END_STAGE";
@@ -134,14 +119,20 @@ GUICommand intcommand::ConvertToGUI(commandbuffer_t command) {
         gui.arg4 = "Unknown";
         break;
     case 9: // "RUN_SUBJOB";
-        if(command.arg1 >= 0 && command.arg1 <= 17) {
+        if(command.arg1 >= 0 || command.arg1 <= 17) {
             gui.arg1 = subjobCommands[command.arg1];
         } else {
             gui.arg1 = "UNKNOWN SUBJOB";
         }
+        gui.arg4 = QString::number(command.arg4);
+
+        if(command.arg1 >= 5 && command.arg1 <= 8) { // "SCRSUBJ_SPU_ON"
+            gui.arg2 = "TODO: box";
+            gui.arg3 = "TODO: num";
+            gui.arg4 = QString::number(command.arg4);
+        }
 
         if(command.arg1 == 0x2) { // "SCRSUBJ_DRAW_CHANGE"
-            gui.arg4 = "TODO: Unknown";
         }
 
         if(command.arg1 == 0xE) { // "SCRSUBJ_SPUTRANS"
