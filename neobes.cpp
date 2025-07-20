@@ -481,11 +481,12 @@ void neobes::drawLineProperties() {
 void neobes::drawInfo() {
     int usedSize = neodata::CalcAvailableStorage();
     int avaiSize = StageInfo.buttondataend - StageInfo.buttondatabase + 1;
+    int displaySize = avaiSize < usedSize ? avaiSize : usedSize;
 
     ui->infoSize->setText(QString::number(usedSize) + "/" + QString::number(avaiSize));
 
     ui->sizeProgressBar->setRange(0, avaiSize);
-    ui->sizeProgressBar->setValue(usedSize);
+    ui->sizeProgressBar->setValue(displaySize);
     QPalette palette = ui->sizeProgressBar->palette();
     palette.setColor(QPalette::Accent, QColor(avaiSize < usedSize ? "#AA0000" : accentColor));
     ui->sizeProgressBar->setPalette(palette);
