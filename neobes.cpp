@@ -498,7 +498,7 @@ void neobes::drawInfo() {
 void neobes::drawEditorGUI() {
     ui->stackedWidget->setCurrentIndex(1);
     drawCommands();
-    QString textGUI = "<br>";
+    QString textGUI = Records[CurrentRecord].variants[CurrentVariant].islinked ? QString("Linked to %1<br>").arg(Records[CurrentRecord].variants[CurrentVariant].linknum) : "<br>";
     updateLog();
 
     for(int curOwner = 0; curOwner < numowners; curOwner++) {
