@@ -128,7 +128,7 @@ neobes::neobes(QWidget *parent)
     });
 
     connect(ui->butProperty, &QTableWidget::cellChanged, this, &neobes::updateButtonProperties);
-
+    connect(ui->lineOptions, &QTableWidget::cellChanged, this, &neobes::updateLineProperties);
     connect(ui->comSelector, &QComboBox::currentIndexChanged, this, [=, this]() {
         neobes::drawCommands();
     });
@@ -479,6 +479,11 @@ void neobes::drawLineProperties() {
         ui->lineOptions->setItem(count,2,subtitle);
         count++;
     }
+}
+
+void neobes::updateLineProperties(int row, int column) {
+    uint32_t coolTres = (uint32_t)ui->lineOptions->item(row,0)->text().toInt();
+    Records[CurrentRecord].variants[MentionedVariant].lines[row].coolmodethreshold = coolTres;
 }
 
 void neobes::drawInfo() {

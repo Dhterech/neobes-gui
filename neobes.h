@@ -50,6 +50,7 @@ private slots:
     void drawEditorGUI();
 
     void updateButtonProperties(int row, int column);
+    void updateLineProperties(int row, int column);
     void updateCommandProperties();
 
     // Other functions
