@@ -96,9 +96,9 @@ neobes::neobes(QWidget *parent)
 
     ui->variantInput->setMaximum(16);
 
-    connect(ui->selregBtn, &QPushButton::clicked, this, &neobes::ASelectRegion);
-
     connect(ui->actionChangeMenu, &QAction::triggered, this, &neobes::changeMenu);
+    connect(ui->actionChangeRegion, &QAction::triggered, this, &neobes::ASelectRegion);
+
     connect(ui->actionLoad, &QAction::triggered, this, &neobes::ALoadProject);
     connect(ui->actionSave, &QAction::triggered, this, &neobes::ASaveProject);
 

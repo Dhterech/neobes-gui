@@ -728,6 +728,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <addaction name="actionLink"/>
     <addaction name="actionLinkAll"/>
     <addaction name="separator"/>
+    <addaction name="actionChangeRegion"/>
    </widget>
    <widget class="QMenu" name="menuPlayback">
     <property name="title">
@@ -886,6 +887,14 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <string>Esc</string>
    </property>
   </action>
+  <action name="actionChangeRegion">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::ViewRefresh"/>
+   </property>
+   <property name="text">
+    <string>Change Region</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="resources.qrc"/>
@@ -932,6 +941,22 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <hint type="sourcelabel">
      <x>508</x>
      <y>248</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>selregBtn</sender>
+   <signal>clicked()</signal>
+   <receiver>actionChangeRegion</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>67</x>
+     <y>55</y>
     </hint>
     <hint type="destinationlabel">
      <x>-1</x>
