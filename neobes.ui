@@ -720,6 +720,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <addaction name="actionUploadEmu"/>
     <addaction name="separator"/>
     <addaction name="actionChangeMenu"/>
+    <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
@@ -895,6 +896,14 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <string>Change Region</string>
    </property>
   </action>
+  <action name="actionExit">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::ApplicationExit"/>
+   </property>
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="resources.qrc"/>
@@ -961,6 +970,22 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <hint type="destinationlabel">
      <x>-1</x>
      <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionExit</sender>
+   <signal>triggered()</signal>
+   <receiver>neobes</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>596</x>
+     <y>374</y>
     </hint>
    </hints>
   </connection>
