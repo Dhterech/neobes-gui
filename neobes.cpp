@@ -242,7 +242,7 @@ void neobes::updateLog() {
 void neobes::ALoadProject()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open BES Project"), "", tr("Any File (*)"));
-    if(fileName == "") return;
+    if(fileName.isEmpty()) return;
     neodata::Log("Loading project from file: " + fileName);
 
     int result = neodata::LoadFromBes(fileName);
@@ -255,7 +255,7 @@ void neobes::ALoadProject()
 void neobes::ASaveProject()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save BES Project"), "", tr("Any File (*)"));
-    if(fileName == "") return;
+    if(fileName.isEmpty()) return;
     neodata::Log("Saving Project to: " + fileName);
 
     int result = neodata::SaveToBes(fileName);
@@ -315,7 +315,7 @@ void neobes::AUploadEmu()
 void neobes::ADownloadOLM()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save Downloaded OLM"), "", tr("Overlay Module (*.OLM)"));
-    if(fileName == "") return; // User Cancel
+    if(fileName.isEmpty()) return; // User Cancel
     int size = QInputDialog::getInt(this, tr("Type the OLM file size"), tr("Type file size"), 0, 0, 52428800);
     if(size == -1) return; // User Cancel
 
@@ -335,7 +335,7 @@ void neobes::ADownloadOLM()
 void neobes::AUploadOLM()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Load OLM to Upload"), "", tr("Overlay Module (*.OLM)"));
-    if(fileName == "") return; // User Cancel
+    if(fileName.isEmpty()) return; // User Cancel
     switch(neodata::UploadOLMToEmu(fileName)) {
     case false:
         QMessageBox::critical(this, "Error on upload", "NeoBES caused an error while uploading to PCSX2.");
@@ -405,7 +405,7 @@ QString drawRecord(int owner, int start, int length, int interval, int cursorPos
             drawnIcon = iconStart.arg(buttonsUIRes[button.buttonid]);
         }
 
-        if(drawnIcon == "") {
+        if(drawnIcon.isEmpty()) {
             int count = dot / interval;
 
             int isStar = count % 4 == 0;
