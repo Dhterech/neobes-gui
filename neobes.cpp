@@ -568,36 +568,46 @@ void neobes::drawCommands() { // NOTE TO JOO: I left it as it is due to extreme 
 }
 
 void neobes::updateCommandProperties() {
-    int currentCommandSelect = ui->comSelector->currentIndex();
-    int currentColumn = ui->comTable->currentColumn();
-    int currentRow = ui->comTable->currentRow();
+    int curComSel = ui->comSelector->currentIndex();
+    int curCol = ui->comTable->currentColumn();
+    int curRow = ui->comTable->currentRow();
 
-    GUICommand guiCom;
-    guiCom.commandType = ui->comTable->item(currentRow, 0)->text();
-    guiCom.arg1 = ui->comTable->item(currentRow, 1)->text();
-    guiCom.arg2 = ui->comTable->item(currentRow, 2)->text();
-    guiCom.arg3 = ui->comTable->item(currentRow, 3)->text();
-    guiCom.arg4 = ui->comTable->item(currentRow, 4)->text();
+    QString editedText = ui->comTable->item(curRow, curCol)->text();
+    commandbuffer_t tmpCommand = ModeCommands[curComSel][curRow];
 
-    commandbuffer_t newCommand = intcommand::ConvertToNormal(guiCom);
+    int newInput = intcommand::ConvertToNormal(editedText, tmpCommand, curRow, curCol);
 
-    switch(currentColumn) {
+    switch(curCol) {
     case 0:
-        ModeCommands[currentCommandSelect][currentRow].cmd_id = newCommand.cmd_id;
+        ModeCommands[curComSel][curRow].cmd_id = newInput;
         break;
     case 1:
-        ModeCommands[currentCommandSelect][currentRow].arg1 = newCommand.arg1;
+        ModeCommands[curComSel][curRow].arg1 = newInput;
         break;
     case 2:
-        ModeCommands[currentCommandSelect][currentRow].arg1 = newCommand.arg2;
+        ModeCommands[curComSel][curRow].arg2 = newInput;
         break;
     case 3:
-        ModeCommands[currentCommandSelect][currentRow].arg1 = newCommand.arg3;
+        ModeCommands[curComSel][curRow].arg3 = newInput;
         break;
     case 4:
-        ModeCommands[currentCommandSelect][currentRow].arg1 = newCommand.arg4;
+        ModeCommands[curComSel][curRow].arg4 = newInput;
         break;
     }
+
+    ui->comTable->blockSignals(true);
+    GUICommand gui = intcommand::ConvertToGUI(tmpCommand);
+    QTableWidgetItem *ctyp = new QTableWidgetItem(gui.commandType);
+    QTableWidgetItem *arg1 = new QTableWidgetItem(gui.arg1);
+    QTableWidgetItem *arg2 = new QTableWidgetItem(gui.arg2);
+    QTableWidgetItem *arg3 = new QTableWidgetItem(gui.arg3);
+    QTableWidgetItem *arg4 = new QTableWidgetItem(gui.arg4);
+    ui->comTable->setItem(curRow, 0, ctyp);
+    ui->comTable->setItem(curRow, 1, arg1);
+    ui->comTable->setItem(curRow, 2, arg2);
+    ui->comTable->setItem(curRow, 3, arg3);
+    ui->comTable->setItem(curRow, 4, arg4);
+    ui->comTable->blockSignals(false);
 }
 
 /* GUI Functions */
