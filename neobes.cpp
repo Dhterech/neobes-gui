@@ -699,6 +699,7 @@ void neobes::ALinkVariant(bool linkAll)
             QMessageBox::warning(this, "Link Variant", "You can't link a linked variant!");
             neodata::Log("Can't link linked variant!");
             updateLog();
+            return;
         }
 
         Records[CurrentRecord].variants[MentionedVariant].setLink(linkId);
