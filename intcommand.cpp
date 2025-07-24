@@ -78,16 +78,18 @@ void intcommand::reverseHandleSceneCommand(GUICommand &gui, uint16_t &rank, uint
     time = gui.arg4.mid(timePrefix.length()).toInt();
 }
 
-void intcommand::handleRecord(GUICommand &gui, int pointer) {
+QString intcommand::handleRecord(int pointer) {
+    QString string;
     int count = 0;
     for(e_suggestrecord_t &record : Records) {
         if(pointer == record.address) {
-            gui.arg4.append(QString::number(count));
-            return;
+            string.append(QString::number(count));
+            return string;
         }
         count++;
     }
-    gui.arg4.append("Not Loaded");
+    string.append("Not Loaded");
+    return string;
 }
 
 uint32_t intcommand::reverseHandleRecord(QString argument) {
@@ -95,6 +97,17 @@ uint32_t intcommand::reverseHandleRecord(QString argument) {
 
     if (recordNum >= 0 && recordNum < Records.size()) return Records[recordNum].address;
     return 0xFFFFFFF;
+}
+
+QString intcommand::handleOwners(uint32_t owner) {
+    QString string;
+    if(owner == 0) string += job_setup_owners[0];
+    else if(owner & 0x01) string += job_setup_owners[1] + " ";
+    else if(owner & 0x02) string += job_setup_owners[2] + " ";
+    else if(owner & 0x04) string += job_setup_owners[3] + " ";
+    else if(owner & 0x08) string += job_setup_owners[4] + " ";
+    else if(owner & 0x10) string += job_setup_owners[5] + " ";
+    return string;
 }
 
 GUICommand intcommand::ConvertToGUI(commandbuffer_t command) {
@@ -107,34 +120,19 @@ GUICommand intcommand::ConvertToGUI(commandbuffer_t command) {
 
     switch(command.cmd_id) {
     case 00: // "SETUP";
-        gui.arg1 = "Owner: ";
-
-        if(command.arg1 == 0) gui.arg1 += job_setup_owners[0];
-        else if(command.arg1 & 0x01) gui.arg1 += job_setup_owners[1] + " ";
-        else if(command.arg1 & 0x02) gui.arg1 += job_setup_owners[2] + " ";
-        else if(command.arg1 & 0x04) gui.arg1 += job_setup_owners[3] + " ";
-        else if(command.arg1 & 0x08) gui.arg1 += job_setup_owners[4] + " ";
-        else if(command.arg1 & 0x10) gui.arg1 += job_setup_owners[5] + " ";
+        gui.arg1 = "Owner: " + handleOwners(command.arg1);
 
         gui.arg2 = "Icon: " + job_setup_icon[command.arg2];
         gui.arg4 = "Time: " + QString::number(command.arg4);
         break;
     case 1: // "LOAD_PLAY_RECORD";
-        gui.arg4 = "Record: ";
-        handleRecord(gui, command.arg4);
+        gui.arg4 = "Record: " + handleRecord(command.arg4);
         break;
     case 2: // "SCORE"
         gui.arg1 = "Rank: " + modesSingleP[command.arg1];
 
         if(VSMode) {
-            gui.arg4 = "Player: ";
-
-            if(command.arg4 == 0) gui.arg4 += job_setup_owners[0];
-            else if(command.arg4 & 0x01) gui.arg4 += job_setup_owners[1] + " ";
-            else if(command.arg4 & 0x02) gui.arg4 += job_setup_owners[2] + " ";
-            else if(command.arg4 & 0x04) gui.arg4 += job_setup_owners[3] + " ";
-            else if(command.arg4 & 0x08) gui.arg4 += job_setup_owners[4] + " ";
-            else if(command.arg4 & 0x10) gui.arg4 += job_setup_owners[5] + " ";
+            gui.arg4 = "Player: " + handleOwners(command.arg4);
         }
         break;
     case 3: // "SCENE_BETTER";
@@ -169,8 +167,7 @@ GUICommand intcommand::ConvertToGUI(commandbuffer_t command) {
         }
 
         if(command.arg1 == 0xE) { // "SCRSUBJ_SPUTRANS"
-            gui.arg4 = "Record: ";
-            handleRecord(gui, command.arg4);
+            gui.arg4 = "Record: " + handleRecord(command.arg4);
         }
 
         if(command.arg1 == 0x12) { // "SCRSUBJ_LESSON"
