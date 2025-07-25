@@ -284,7 +284,7 @@ void neobes::ADownloadEmu()
         drawEditorGUI();
         break;
     case 1:
-        QMessageBox::critical(this, "Error on download", "PCSX2 wasn't found! Please verify that you're using PCSX2 Nightly with PINE enabled.");
+        QMessageBox::critical(this, "Error on download", "PCSX2 wasn't found! Please verify that you're using PCSX2 with PINE enabled.");
         break;
     case 2:
         QMessageBox::critical(this, "Error on download", "NeoBES caused an error while loading from PCSX2.");
@@ -310,9 +310,12 @@ void neobes::AUploadEmu()
         QMessageBox::information(this, "Uploaded Successfully", "The project file was uploaded successfully into PCSX2.");
         break;
     case 1:
-        QMessageBox::critical(this, "Error on upload", "PCSX2 wasn't found! Please verify that you're using PCSX2 Nightly with PINE enabled.");
+        QMessageBox::critical(this, "Error on upload", "PCSX2 wasn't found! Please verify that you're using PCSX2 with PINE enabled.");
         break;
-    case 2:
+    case 3:
+        QMessageBox::critical(this, "Error on upload", "This project is for another stage! Please verify compatibility and if is paused on the correct stage.");
+        break;
+    default:
         QMessageBox::critical(this, "Error on upload", "NeoBES caused an error while uploading to PCSX2.");
         break;
     }
@@ -335,7 +338,7 @@ void neobes::ADownloadOLM()
         QMessageBox::information(this, "Success on download", "The OLM File was downloaded successfully.");
         break;
     case 2:
-        QMessageBox::critical(this, "Error on upload", "PCSX2 wasn't found! Please verify that you're using PCSX2 Nightly with PINE enabled.");
+        QMessageBox::critical(this, "Error on upload", "PCSX2 wasn't found! Please verify that you're using PCSX2 with PINE enabled.");
         break;
     };
 }
@@ -352,7 +355,7 @@ void neobes::AUploadOLM()
         QMessageBox::information(this, "Success on upload", "The OLM File was uploaded successfully.");
         break;
     case 2:
-        QMessageBox::critical(this, "Error on upload", "PCSX2 wasn't found! Please verify that you're using PCSX2 Nightly with PINE enabled.");
+        QMessageBox::critical(this, "Error on upload", "PCSX2 wasn't found! Please verify that you're using PCSX2 with PINE enabled.");
         break;
     };
 }

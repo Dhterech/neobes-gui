@@ -222,6 +222,11 @@ int neodata::SaveToEmu() {
         pcxs2GetModelist(StageInfo.stagemodelistbase, ModeSize); // Project File doesn't have modes
         modestage = StageInfo.name;
     }
+
+    uint32_t loadedStage = 0xFFFF;
+    pcsx2reader::read(CURRENT_STAGE[CurrentRegion], &loadedStage, 4);
+    if(loadedStage != CurrentStage + 1) return 3;
+
     try {
         bool result = pcsx2upload(Records, Modes, ModeCommands, StageInfo, VSMode, PALMode, SUBMode, OopsSize, ModeSize);
         if(result == false) return 4;
