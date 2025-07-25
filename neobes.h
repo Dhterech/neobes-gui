@@ -36,7 +36,7 @@ private slots:
     void AButtonPaste();
 
     // Main functions
-    void ASaveProject();
+    int ASaveProject();
     void ALoadProject();
 
     void AUploadOLM();

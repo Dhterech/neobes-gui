@@ -183,25 +183,28 @@ void neobes::keyPressEvent(QKeyEvent *event)
 
 void neobes::closeEvent(QCloseEvent *event) {
     if(hasEdited) {
-        int result = displaySaveDlg();
-        switch(result) {
-        case QMessageBox::Save:
-            ASaveProject();
-            break;
-        case QMessageBox::Cancel:
-            event->ignore();
-            break;
-        }
+        int wantsToGo = displaySaveDlg();
+        if(!wantsToGo) event->ignore();
     }
 }
 
 int neobes::displaySaveDlg() {
     QMessageBox msgBox;
-    msgBox.setText("The Project file has been modified.");
+    msgBox.setWindowTitle("Unsaved Changes");
+    msgBox.setIcon(QMessageBox::Warning);
+    msgBox.setText("The project file has been modified.");
     msgBox.setInformativeText("Do you want to save your changes?");
     msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
     msgBox.setDefaultButton(QMessageBox::Save);
-    return msgBox.exec();
+
+    switch(msgBox.exec()) {
+    case QMessageBox::Save:
+        return ASaveProject();
+    case QMessageBox::Discard:
+        return true;
+    default:
+        return false;
+    }
 }
 
 /* Drag and Drop */
@@ -252,17 +255,22 @@ void neobes::ALoadProject()
     updateLog();
 }
 
-void neobes::ASaveProject()
+int neobes::ASaveProject()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save BES Project"), "", tr("Any File (*)"));
-    if(fileName.isEmpty()) return;
+    if(fileName.isEmpty()) return 0;
     neodata::Log("Saving Project to: " + fileName);
 
     int result = neodata::SaveToBes(fileName);
     if(result == 0) {neodata::Log("Saved project file successfully.");}
-    else QMessageBox::critical(this, "Error on project save", strerror(result));
+    else {
+        QMessageBox::critical(this, "Error on project save", strerror(result));
+        neodata::Log("Could not save project." + QString(strerror(result)));
+        return 0;
+    }
 
     updateLog();
+    return 1;
 }
 
 /* DOWNLOAD EMU / UPLOAD EMU */
@@ -568,6 +576,7 @@ void neobes::drawCommands() { // NOTE TO JOO: I left it as it is due to extreme 
 }
 
 void neobes::updateCommandProperties() {
+    hasEdited = true;
     int curComSel = ui->comSelector->currentIndex();
     int curCol = ui->comTable->currentColumn();
     int curRow = ui->comTable->currentRow();
@@ -652,6 +661,7 @@ void neobes::handlePrecKeys(int inc) {
 }
 
 void neobes::handleButtonKeys(int buttonId) {
+    hasEdited = true;
     if(buttonId == 0) AButtonDelete();
     else Records[CurrentRecord].variants[MentionedVariant].createButton((cursorpos * 24) + precpos, owners[cursorowner], buttonId);
 }
@@ -668,6 +678,7 @@ void neobes::AButtonCut() {
 }
 
 void neobes::AButtonDelete() {
+    hasEdited = true;
     Records[CurrentRecord].variants[MentionedVariant].deleteButton((cursorpos * 24) + precpos, owners[cursorowner]);
 }
 
@@ -689,6 +700,7 @@ void neobes::ALinkVariant(bool linkAll)
 
     if(linkAll) {
         for(int i = 0; i < 17; i++) {
+            hasEdited = true;
             if(i != CurrentVariant) Records[CurrentRecord].variants[i].setLink(linkId);
         }
     } else {
@@ -702,6 +714,7 @@ void neobes::ALinkVariant(bool linkAll)
             return;
         }
 
+        hasEdited = true;
         Records[CurrentRecord].variants[MentionedVariant].setLink(linkId);
     }
 
@@ -710,6 +723,7 @@ void neobes::ALinkVariant(bool linkAll)
 
 void neobes::ASetSoundboard()
 {
+    hasEdited = true;
     int sbId = QInputDialog::getInt(this, tr("Soundboard Change"), tr("Type the soundboard id to change"), 0, 0, Records.size());
     if(sbId == -1) return; // User Cancel
 
