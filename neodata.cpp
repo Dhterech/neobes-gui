@@ -239,6 +239,7 @@ int neodata::LoadFromEmu() {
     Log(" Status: Reading current stage...");
 
     pcsx2reader::read(CURRENT_STAGE[CurrentRegion], &CurrentStage, 1); CurrentStage--;
+    if(CurrentStage < 0 || CurrentStage > 18) return 3;
     CloseProject();
 
     Log(" Status: Getting stage info & sound database...");

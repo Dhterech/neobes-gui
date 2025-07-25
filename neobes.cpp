@@ -289,6 +289,9 @@ void neobes::ADownloadEmu()
     case 2:
         QMessageBox::critical(this, "Error on download", "NeoBES caused an error while loading from PCSX2.");
         break;
+    case 3:
+        QMessageBox::critical(this, "Error on download", "Can't confirm a compatible stage! Please verify game region and if is paused on a actual stage.");
+        break;
     }
 }
 
