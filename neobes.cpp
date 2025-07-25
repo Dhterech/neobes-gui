@@ -244,12 +244,17 @@ void neobes::updateLog() {
 
 void neobes::ALoadProject()
 {
+    if(hasEdited) {
+        int wantsToGo = displaySaveDlg();
+        if(!wantsToGo) return;
+    }
+
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open BES Project"), "", tr("Any File (*)"));
     if(fileName.isEmpty()) return;
     neodata::Log("Loading project from file: " + fileName);
 
     int result = neodata::LoadFromBes(fileName);
-    if(result == 0) { drawEditorGUI(); neodata::Log("Loaded project file successfully."); }
+    if(result == 0) { drawEditorGUI(); hasEdited = false; neodata::Log("Loaded project file successfully."); }
     else QMessageBox::critical(this, "Error on project load", strerror(result));
 
     updateLog();
@@ -277,10 +282,16 @@ int neobes::ASaveProject()
 
 void neobes::ADownloadEmu()
 {
+    if(hasEdited) {
+        int wantsToGo = displaySaveDlg();
+        if(!wantsToGo) return;
+    }
+
     neodata::Log("Downloading from PCSX2...");
 
     switch(neodata::LoadFromEmu()) {
     case 0:
+        hasEdited = false;
         drawEditorGUI();
         break;
     case 1:
@@ -391,7 +402,7 @@ void neobes::AAboutGUI() {
 void neobes::changeMenu() {
     if(Records.size() != 0) {
         isMenu = !isMenu;
-        ui->actionChangeMenu->enabledChanged(true);
+        ui->actionChangeMenu->setEnabled(true);
 
         if(isMenu) drawMenuGUI();
         else drawEditorGUI();
