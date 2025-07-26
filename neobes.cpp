@@ -115,7 +115,6 @@ neobes::neobes(QWidget *parent)
     connect(ui->actionLinkAll, &QAction::triggered, this, [=, this]() {neobes::ALinkVariant(true);});
     connect(ui->actionPlayRecord, &QAction::triggered, this, [=, this](){neobes::APlayVariant(false);});
     connect(ui->actionPlayRecordTicker, &QAction::triggered, this, [=, this](){neobes::APlayVariant(true);});
-    connect(ui->actionLoadAdditionalData, &QAction::triggered, this, &neobes::ALoadAdditionalData);
 
     connect(ui->actionSetRecSB, &QAction::triggered, this, &neobes::ASetSoundboard);
 
@@ -766,27 +765,4 @@ void neobes::ASetSoundboard()
 
 void neobes::APlayVariant(bool ticker) {
     audio->playVariant(Records[CurrentRecord].variants[MentionedVariant], StageInfo.bpm, ticker);
-}
-
-void neobes::ALoadAdditionalData() {
-    hasEdited = true;
-
-    neodata::Log("Loading additional data...");
-
-    switch(neodata::LoadExtraFromEmu()) {
-    case 0:
-        neodata::Log("Loaded additional data successfully.");
-        drawEditorGUI();
-        break;
-    case 1:
-        QMessageBox::critical(this, "Error on download", "PCSX2 wasn't found! Please verify that you're using PCSX2 with PINE enabled.");
-        break;
-    case 2:
-        QMessageBox::critical(this, "Error on download", "NeoBES caused an error while loading additional data from PCSX2.");
-        break;
-    case 3:
-        QMessageBox::critical(this, "Error on download", "Can't confirm it is the same stage! Please verify game region and if is paused on the same stage as the project.");
-        break;
-    }
-
 }

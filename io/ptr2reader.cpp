@@ -264,8 +264,9 @@ void pcsx2ParseComRecords() {
 
 void pcsx2GetComBuffers() {
     commandbuffer_t cb;
+    ModeCommands.clear();
 
-    for(int i = ModeCommands.size(); i < Modes.size(); i++) {
+    for(int i = 0; i < Modes.size(); i++) {
         std::vector<commandbuffer_t> modecbs;
         for(int k = 0; k < Modes[i].count_scenecommands; k++) {
             pcsx2reader::read(Modes[i].ptr_scenecommands + (k * sizeof(commandbuffer_t)), &cb, sizeof(commandbuffer_t));
@@ -277,8 +278,9 @@ void pcsx2GetComBuffers() {
 
 void pcxs2GetModelist(uint32_t stagemode_start, int count) {
     scenemode_t scene;
+    Modes.clear();
 
-    for(int i = Modes.size(); i < count; i++) {
+    for(int i = 0; i < count; i++) {
         pcsx2reader::read(stagemode_start + (i * sizeof(scene)), &scene, sizeof(scene));
         Modes.push_back(scene);
     }

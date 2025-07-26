@@ -247,33 +247,12 @@ int neodata::LoadFromEmu() {
 
     Log(" Status: Reading game lines...");
     try {
-        Modes.clear();
-        ModeCommands.clear();
         pcxs2GetModelist(StageInfo.stagemodelistbase, ModeSize);
         pcsx2GetComBuffers();
         pcsx2ParseComRecords();
         pcsx2GetSoundboards(hdlistbase, bdlistbase, numhd);
         pcsx2GetKeytables(StageInfo.keytablebase, numhd, 0);
     } catch(...) { return 2; }
-    return 0;
-}
-
-int neodata::LoadExtraFromEmu() { // Fix old mods with no extra data
-    if(!pcsx2reader::IsEmuOpen()) return 1;
-    Log(" Status: Reading extra data...");
-
-    uint32_t tempStage = 0;
-    pcsx2reader::read(CURRENT_STAGE[CurrentRegion], &tempStage, 1); tempStage--;
-    if(tempStage != CurrentStage) return 3;
-
-    // Redoing these steps will download the missing parts
-    ImportStageInfo();
-    try {
-        pcxs2GetModelist(StageInfo.stagemodelistbase, ModeSize);
-        pcsx2GetComBuffers();
-        pcsx2ParseComRecords();
-    } catch(...) { return 2; }
-
     return 0;
 }
 

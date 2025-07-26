@@ -36,7 +36,6 @@ public:
 
     int static LoadFromBes(QString fileName);
     int static LoadFromEmu();
-    int static LoadExtraFromEmu();
     //int static LoadFromOlm(QString fileName);
 
     int static SaveToBes(QString fileName);

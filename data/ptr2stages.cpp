@@ -24,7 +24,7 @@ stageinfo_t stages[18] = {
     {
         "BIG",
         78.0,
-        18,
+        9, // Actual value is 18, but breaks everything
         {
             {0x01D47A68, 0x01CEB2A8, 0x110},
             {0x01D4B588, 0x01CEC0F8, 0x110}
