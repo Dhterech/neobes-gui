@@ -730,7 +730,6 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <addaction name="actionLinkAll"/>
     <addaction name="separator"/>
     <addaction name="actionChangeRegion"/>
-    <addaction name="actionLoadAdditionalData"/>
    </widget>
    <widget class="QMenu" name="menuPlayback">
     <property name="title">
@@ -903,14 +902,6 @@ li.checked::marker { content: &quot;\2612&quot;; }
    </property>
    <property name="text">
     <string>Exit</string>
-   </property>
-  </action>
-  <action name="actionLoadAdditionalData">
-   <property name="icon">
-    <iconset theme="QIcon::ThemeIcon::DocumentPrintPreview"/>
-   </property>
-   <property name="text">
-    <string>Load Additional Data</string>
    </property>
   </action>
  </widget>

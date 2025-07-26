@@ -257,11 +257,6 @@ void neobes::ALoadProject()
     if(result == 0) {
         drawEditorGUI();
         hasEdited = false;
-
-        if(Modes.size() != ModeSize) {
-            neodata::Log("Loaded project needs additional data.");
-            QMessageBox::warning(this, "Additional data", "The stage on this project has more scenes or more buttons that werent loaded on ptr2besms projects and could cause bugs if not loaded.\n\nUse Tools > Load Additional Data with the game of the same region paused on the same stage to fix this issue.");
-        }
         neodata::Log("Loaded project file successfully.");
     }
     else QMessageBox::critical(this, "Error on project load", strerror(result));
