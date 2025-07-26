@@ -57,6 +57,7 @@ private slots:
     void ALinkVariant(bool linkAll);
     void ASetSoundboard();
     void APlayVariant(bool ticker);
+    void ALoadAdditionalData();
 
 private:
     Ui::neobes *ui;

@@ -21,6 +21,7 @@ struct regioninfo_t {
 struct stageinfo_t {
     const QString name;
     double bpm;
+    int modescenes;
     regioninfo_t regions[3];
 };
 

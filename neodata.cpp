@@ -62,10 +62,7 @@ void neodata::ImportStageInfo() {
     VSMode = CurrentStage > 9;
     //numowners = (isVSMode) ? 1 : 3;
     OopsSize = (VSMode ? 3 : 2) * 6 * sizeof(suggestbutton_t);
-    // Modelist Size
-    ModeSize = VSMode ? 9 : 9; // FIXME: VS Wrong number, black screen
-    if(CurrentStage == 7 || CurrentStage == 6) ModeSize = 27; // Stage 8 & 7 Extra data
-    if(CurrentStage == 5) ModeSize = 24; // Stage 6 Extra data
+    ModeSize = stages[CurrentStage].modescenes;
 }
 
 /* Import/Export */
@@ -138,7 +135,7 @@ int neodata::SaveToBes(QString fileName) {
 #undef WRITE
 
 #define READ(x) rawFile.read(reinterpret_cast<char *>(&x), sizeof(x));
-void loadScene() {
+void loadSceneCommands() {
     std::vector<commandbuffer_t> buffer;
     READ(tmpu32); buffer.resize(tmpu32);
     for(commandbuffer_t &cmd : buffer) READ(cmd);
@@ -147,14 +144,14 @@ void loadScene() {
 
 int neodata::LoadFromBes(QString fileName) {
     rawFile.open(fileName.toUtf8(), std::ios_base::in | std::ios_base::binary);
-    if(!rawFile.is_open()) return errno;//GetLastError();
+    if(!rawFile.is_open()) return errno;
 
     CloseProject();
 
     READ(tmpu32); CurrentStage = tmpu32;
     ImportStageInfo();
 
-    for(int i = 0; i < 9; i++) loadScene();
+    for(int i = 0; i < 9; i++) loadSceneCommands();
 
     READ(tmpu32); Records.resize(tmpu32);
     for(e_suggestrecord_t &record : Records) {
@@ -203,7 +200,7 @@ int neodata::LoadFromBes(QString fileName) {
         Log("Found extra data on: " + QString::number(rawFile.tellg()));
         READ(tmpu32); ModeSize = tmpu32;
         if(ModeSize > 9) { // Extra scenes
-            for(int i = 9; i < ModeSize; i++) loadScene();
+            for(int i = 9; i < ModeSize; i++) loadSceneCommands();
         }
     } else {
         ModeSize = 9;
@@ -250,12 +247,33 @@ int neodata::LoadFromEmu() {
 
     Log(" Status: Reading game lines...");
     try {
+        Modes.clear();
+        ModeCommands.clear();
         pcxs2GetModelist(StageInfo.stagemodelistbase, ModeSize);
         pcsx2GetComBuffers();
         pcsx2ParseComRecords();
         pcsx2GetSoundboards(hdlistbase, bdlistbase, numhd);
         pcsx2GetKeytables(StageInfo.keytablebase, numhd, 0);
     } catch(...) { return 2; }
+    return 0;
+}
+
+int neodata::LoadExtraFromEmu() { // Fix old mods with no extra data
+    if(!pcsx2reader::IsEmuOpen()) return 1;
+    Log(" Status: Reading extra data...");
+
+    uint32_t tempStage = 0;
+    pcsx2reader::read(CURRENT_STAGE[CurrentRegion], &tempStage, 1); tempStage--;
+    if(tempStage != CurrentStage) return 3;
+
+    // Redoing these steps will download the missing parts
+    ImportStageInfo();
+    try {
+        pcxs2GetModelist(StageInfo.stagemodelistbase, ModeSize);
+        pcsx2GetComBuffers();
+        pcsx2ParseComRecords();
+    } catch(...) { return 2; }
+
     return 0;
 }
 
