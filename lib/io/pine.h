@@ -89,9 +89,9 @@ protected:
      * Socket handler. @n
      * On windows it uses the type SOCKET, on linux int.
      */
-    SOCKET sock;
+    SOCKET sock = INVALID_SOCKET;
 #else
-    int sock;
+    int sock = -1;
 #endif
 
     /**
@@ -449,7 +449,7 @@ public:
         unsigned int msg_size;          /**< Number of IPC messages. */
         bool reloc; /**< Whether the message needs relocation. */
 
-// C bindings handle manually the freeing of such resources.
+        // C bindings handle manually the freeing of such resources.
 #ifndef C_FFI
         /**
          * BatchCommand Destructor.
@@ -1088,9 +1088,9 @@ public:
         runtime_dir = std::getenv("TMPDIR");
 #else
         runtime_dir = std::getenv("XDG_RUNTIME_DIR");
-#endif \
-    // fallback in case macOS or other OSes don't implement the XDG base \
-    // spec
+#endif
+        // fallback in case macOS or other OSes don't implement the XDG base
+        // spec
         if (runtime_dir == nullptr)
             SOCKET_NAME = "/tmp/" + emulator_name + ".sock";
         else {
@@ -1101,9 +1101,9 @@ public:
         if (!default_slot) {
             SOCKET_NAME += "." + std::to_string(slot);
         }
-#endif \
-    // we allocate once buffers to not have to do mallocs for each IPC \
-    // request, as malloc is expansive when we optimize for µs.
+#endif
+        // we allocate once buffers to not have to do mallocs for each IPC
+        // request, as malloc is expansive when we optimize for µs.
         ret_buffer = new char[MAX_IPC_RETURN_SIZE];
         ipc_buffer = new char[MAX_IPC_SIZE];
         batch_arg_place = new unsigned int[MAX_BATCH_REPLY_COUNT];
@@ -1117,11 +1117,35 @@ public:
         // We clean up winsock.
 #ifdef _WIN32
         WSACleanup();
+#else
+        if (sock > -1) {
+            close_portable(sock);
+        }
 #endif
         delete[] ret_buffer;
         delete[] ipc_buffer;
         delete[] batch_arg_place;
     }
+
+    /**
+     * Disable the copy constructor.
+     */
+    Shared(const Shared& rhs) = delete;
+
+    /**
+     * Disable the move constructor.
+     */
+    Shared(Shared&& rhs) = delete;
+
+    /**
+     * Disable the copy assignment operator.
+     */
+    Shared& operator=(const Shared& rhs) = delete;
+
+    /**
+     * Disable the move assignment operator.
+     */
+    Shared& operator=(Shared&& rhs) = delete;
 };
 
 class PCSX2 : public Shared {
