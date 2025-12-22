@@ -722,7 +722,7 @@ void neobes::ALinkVariant(bool linkAll)
     if(linkAll) {
         for(int i = 0; i < 17; i++) {
             hasEdited = true;
-            if(i != CurrentVariant) Records[CurrentRecord].variants[i].setLink(linkId);
+            if(i != linkId) Records[CurrentRecord].variants[i].setLink(linkId);
         }
     } else {
         if(linkId == CurrentVariant) {
