@@ -37,12 +37,17 @@ uint32_t findbdbase(uint32_t RESOURCE_LIST_BASE) {
     return hdbase + (getnumhd(hdbase) * 4);
 }
 
-uint32_t getvhbasefromhd(uint32_t hdbase) {
-    return hdbase + 0x50; //FIXME: Assuming 0x50 offset
+uint32_t getheadfromhd(uint32_t hdbase) {
+    uint32_t version_chunk_size;
+    pcsx2reader::read(hdbase + 0x08, &version_chunk_size, 4);
+    return hdbase + version_chunk_size;
 }
 
-uint32_t getheadfromhd(uint32_t hdbase) {
-    return hdbase + 0x10; //FIXME: Assuming 0x10 offset
+uint32_t getvhbasefromhd(uint32_t hdbase) {
+    uint32_t head = getheadfromhd(hdbase);
+    uint32_t vag_info_offset;
+    pcsx2reader::read(head + 0x20, &vag_info_offset, 4);
+    return hdbase + vag_info_offset;
 }
 
 uint32_t getsmplfromhd(uint32_t hdbase) {
