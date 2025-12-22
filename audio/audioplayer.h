@@ -37,6 +37,7 @@ public:
     void playVariant(const e_suggestvariant_t &variant, double bpm, bool ticker) {
         tickerSet = ticker;
         tickerInterval = 60/bpm;
+        nextTickerTime = 0;
 
         tokens.clear();
         double spsd = bpmToSpsd(bpm);
@@ -45,7 +46,7 @@ public:
         for (const e_suggestline_t &line : variant.lines) {
             for (const suggestbutton_t &button : line.buttons) {
                 for (const soundentry_t &se : button.sounds) {
-                    if (se.soundid == 0xFF) continue;
+                    if (se.soundid == 0xFFFF) continue;
                     playtoken_t token;
                     token.when = (spsd * double(button.timestamp + line.timestamp_start)) +
                                  (double(se.relativetime) / double(GAME_FRAMERATE[CurrentRegion]));
@@ -75,6 +76,12 @@ private slots:
     void playNextSound() {
         double rtime = getDeltaTime();  // Get the time since playback started
 
+        // Play ticker
+        if (rtime >= nextTickerTime && tickerSet) {
+            playTicker();
+            nextTickerTime += tickerInterval;
+        }
+
         // Play the next sound if enough time has passed
         while (currentSoundIndex < tokens.size() && rtime >= tokens[currentSoundIndex].when) {
             playSound(tokens[currentSoundIndex].soundid);
@@ -82,7 +89,7 @@ private slots:
         }
 
         // Stop playback if all sounds are played
-        if (currentSoundIndex > tokens.size()) {
+        if (currentSoundIndex >= tokens.size()) {
             timer->stop();
             soundenv.stopAll();
         }
@@ -105,8 +112,8 @@ private:
     QElapsedTimer playTimer;
 
     bool tickerSet = false;
-    int tickerInterval = 0;
-    int nextTickerTime = 0;
+    double tickerInterval = 0;
+    double nextTickerTime = 0;
 
     soundenv_t soundenv;
     int lastSBLoaded = -1;

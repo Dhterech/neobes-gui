@@ -2,6 +2,8 @@
 #include "lib/audio/adpcm.h"
 #include "lib/audio/bdutil.h"
 
+#include <QFile>
+#include <QByteArray>
 #include <cstdio>  // For file operations (fopen, fread, fclose)
 #include <cstdlib> // For malloc, free
 #include <vector>
@@ -176,20 +178,25 @@ void soundenv_t::stopAll() {
     }
 }
 
-void loadTicker() {
-    FILE* file = fopen("tick.raw", "rb");
-    if (!file) return;
+void loadTicker()
+{
+    QFile file(":/res/tick.raw");  // path inside your .qrc
+    if (!file.open(QIODevice::ReadOnly)) return;
 
-    fseek(file, 0, SEEK_END);
-    size_t fileSize = ftell(file);
-    fseek(file, 0, SEEK_SET);
+    QByteArray data = file.readAll();
+    file.close();
 
-    std::vector<char> data(fileSize);
-    fread(data.data(), 1, fileSize, file);
-    fclose(file);
+    if (data.isEmpty())
+        return;
 
     alGenBuffers(1, &tickerSound.buffer);
-    alBufferData(tickerSound.buffer, AL_FORMAT_MONO16, data.data(), fileSize, 24000);
+    alBufferData(
+        tickerSound.buffer,
+        AL_FORMAT_MONO16,
+        data.constData(),
+        data.size(),
+        24000
+        );
 
     alGenSources(1, &tickerSound.source);
     alSourcei(tickerSound.source, AL_BUFFER, tickerSound.buffer);
