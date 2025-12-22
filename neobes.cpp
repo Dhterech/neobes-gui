@@ -74,6 +74,7 @@ QString logged;
 int CurrentRecord;
 int CurrentVariant;
 int MentionedVariant;
+int SelectedLine;
 bool hasEdited;
 
 suggestbutton_t copiedButton;
@@ -281,6 +282,7 @@ int neobes::ASaveProject()
         return 0;
     }
 
+    hasEdited = false;
     updateLog();
     return 1;
 }
@@ -514,6 +516,7 @@ void neobes::drawLineProperties() {
 }
 
 void neobes::updateLineProperties(int row, int column) {
+    hasEdited = true;
     uint32_t coolTres = (uint32_t)ui->lineOptions->item(row,0)->text().toInt();
     Records[CurrentRecord].variants[MentionedVariant].lines[row].coolmodethreshold = coolTres;
 }
@@ -718,10 +721,12 @@ void neobes::AButtonPaste() { // TODO: Check better solution for Paste
 }
 
 void neobes::ALineCreate() {
+    hasEdited = true;
     Records[CurrentRecord].variants[MentionedVariant].createLine((cursorpos * 24) + precpos, (cursorpos * 24) + precpos + 24, owners[cursorowner]);
 }
 
 void neobes::ALineDelete() {
+    hasEdited = true;
     Records[CurrentRecord].variants[MentionedVariant].deleteLine((cursorpos * 24) + precpos, owners[cursorowner]);
 }
 
