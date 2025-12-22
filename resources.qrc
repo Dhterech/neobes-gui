@@ -9,6 +9,7 @@
     </qresource>
     <qresource prefix="/">
         <file>res/neobes.ico</file>
+        <file>res/tick.raw</file>
     </qresource>
     <qresource prefix="/editor/buttons">
         <file>res/editor/buttons/circle.png</file>
