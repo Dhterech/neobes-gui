@@ -37,6 +37,9 @@ private slots:
     void ALineCreate();
     void ALineDelete();
 
+    void ACommandCreate();
+    void ACommandDelete();
+
     // Main functions
     int ASaveProject();
     void ALoadProject();

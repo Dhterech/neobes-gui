@@ -134,6 +134,8 @@ neobes::neobes(QWidget *parent)
         neobes::drawCommands();
     });
     connect(ui->comTable, &QTableWidget::cellChanged, this, &neobes::updateCommandProperties);
+    connect(ui->addCom, &QPushButton::clicked, this, &neobes::ACommandCreate);
+    connect(ui->remCom, &QPushButton::clicked, this, &neobes::ACommandDelete);
 
     /* Init audio */
     audio = new AudioPlayer();
@@ -632,7 +634,7 @@ void neobes::updateCommandProperties() {
     }
 
     ui->comTable->blockSignals(true);
-    GUICommand gui = intcommand::ConvertToGUI(tmpCommand);
+    GUICommand gui = intcommand::ConvertToGUI(ModeCommands[curComSel][curRow]);
     QTableWidgetItem *ctyp = new QTableWidgetItem(gui.commandType);
     QTableWidgetItem *arg1 = new QTableWidgetItem(gui.arg1);
     QTableWidgetItem *arg2 = new QTableWidgetItem(gui.arg2);
@@ -728,6 +730,30 @@ void neobes::ALineCreate() {
 void neobes::ALineDelete() {
     hasEdited = true;
     Records[CurrentRecord].variants[MentionedVariant].deleteLine((cursorpos * 24) + precpos, owners[cursorowner]);
+}
+
+void neobes::ACommandCreate() {
+    hasEdited = true;
+    int curComSel = ui->comSelector->currentIndex();
+    int curRow = ui->comTable->currentRow();
+    commandbuffer_t newCom;
+    newCom.cmd_id = 0;
+    newCom.arg1 = 0;
+    newCom.arg2 = 0;
+    newCom.arg3 = 0;
+    newCom.arg4 = 0;
+
+    ModeCommands[curComSel].insert(ModeCommands[curComSel].begin() + curRow, newCom);
+    drawCommands();
+}
+
+void neobes::ACommandDelete() {
+    hasEdited = true;
+    int curComSel = ui->comSelector->currentIndex();
+    int curRow = ui->comTable->currentRow();
+
+    ModeCommands[curComSel].erase(ModeCommands[curComSel].begin() + curRow);
+    drawCommands();
 }
 
 void neobes::ALinkVariant(bool linkAll)
