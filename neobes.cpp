@@ -171,6 +171,9 @@ void neobes::keyPressEvent(QKeyEvent *event)
         case Qt::Key_X: AButtonCut(); break;
         case Qt::Key_C: AButtonCopy(); break;
         case Qt::Key_V: AButtonPaste(); break;
+        /* Managing Lines */
+        case Qt::Key_Space: ALineCreate(); break;
+        case Qt::Key_Backspace: ALineDelete(); break;
         /* Don't draw when not needed */
         default: return;
         }
@@ -712,6 +715,14 @@ void neobes::AButtonPaste() { // TODO: Check better solution for Paste
     if(Records[CurrentRecord].variants[MentionedVariant].getButRefFromSubdot(owners[cursorowner], (cursorpos * 24) + precpos, &pbutton)) {
         for(int s = 0; s < 4; s++) pbutton->sounds[s] = copiedButton.sounds[s];
     }
+}
+
+void neobes::ALineCreate() {
+    Records[CurrentRecord].variants[MentionedVariant].createLine((cursorpos * 24) + precpos, (cursorpos * 24) + precpos + 24, owners[cursorowner]);
+}
+
+void neobes::ALineDelete() {
+    Records[CurrentRecord].variants[MentionedVariant].deleteLine((cursorpos * 24) + precpos, owners[cursorowner]);
 }
 
 void neobes::ALinkVariant(bool linkAll)

@@ -34,6 +34,8 @@ private slots:
     void AButtonCut();
     void AButtonDelete();
     void AButtonPaste();
+    void ALineCreate();
+    void ALineDelete();
 
     // Main functions
     int ASaveProject();
