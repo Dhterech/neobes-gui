@@ -780,7 +780,7 @@ void neobes::ALinkVariant(bool linkAll)
         }
 
         hasEdited = true;
-        Records[CurrentRecord].variants[MentionedVariant].setLink(linkId);
+        Records[CurrentRecord].variants[CurrentVariant].setLink(linkId);
     }
 
     drawEditorGUI();
