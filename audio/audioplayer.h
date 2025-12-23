@@ -34,13 +34,14 @@ public:
     }
 
     // Function to load the audio variant and start playback
-    void playVariant(const e_suggestvariant_t &variant, double bpm, bool ticker) {
+    void playVariant(const e_suggestvariant_t &variant, int length, double bpm, bool ticker) {
         tickerSet = ticker;
         tickerInterval = 60/bpm;
         nextTickerTime = 0;
 
         tokens.clear();
         double spsd = bpmToSpsd(bpm);
+        lineEnd = spsd * length;
 
         // Prepare tokens from the variant
         for (const e_suggestline_t &line : variant.lines) {
@@ -89,7 +90,7 @@ private slots:
         }
 
         // Stop playback if all sounds are played
-        if (currentSoundIndex >= tokens.size()) {
+        if (rtime >= lineEnd) {
             timer->stop();
             soundenv.stopAll();
         }
@@ -114,6 +115,7 @@ private:
     bool tickerSet = false;
     double tickerInterval = 0;
     double nextTickerTime = 0;
+    double lineEnd = 0;
 
     soundenv_t soundenv;
     int lastSBLoaded = -1;

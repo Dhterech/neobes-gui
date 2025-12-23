@@ -801,5 +801,5 @@ void neobes::ASetSoundboard()
 }
 
 void neobes::APlayVariant(bool ticker) {
-    audio->playVariant(Records[CurrentRecord].variants[MentionedVariant], StageInfo.bpm, ticker);
+    audio->playVariant(Records[CurrentRecord].variants[MentionedVariant], Records[CurrentRecord].lengthinsubdots, StageInfo.bpm, ticker);
 }
