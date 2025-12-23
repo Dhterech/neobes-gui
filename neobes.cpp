@@ -744,6 +744,7 @@ void neobes::ACommandCreate() {
     newCom.arg4 = 0;
 
     ModeCommands[curComSel].insert(ModeCommands[curComSel].begin() + curRow, newCom);
+    Modes[curComSel].count_scenecommands++;
     drawCommands();
 }
 
@@ -753,6 +754,7 @@ void neobes::ACommandDelete() {
     int curRow = ui->comTable->currentRow();
 
     ModeCommands[curComSel].erase(ModeCommands[curComSel].begin() + curRow);
+    Modes[curComSel].count_scenecommands--;
     drawCommands();
 }
 
