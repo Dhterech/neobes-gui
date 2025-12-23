@@ -758,7 +758,7 @@ void neobes::ACommandDelete() {
 
 void neobes::ALinkVariant(bool linkAll)
 {
-    int linkId = QInputDialog::getInt(this, tr("Link Variant"), tr("Type the variant to link to"), 0, 0, Records.size());
+    int linkId = QInputDialog::getInt(this, tr("Link Variant"), tr("Type the variant to link to"), 0, 0, 16);
     if(linkId == -1) return; // User Cancel
 
     if(linkAll) {
