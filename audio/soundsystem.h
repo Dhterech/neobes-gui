@@ -1,12 +1,12 @@
-#ifndef BES_SS_H
-#define BES_SS_H
+#ifndef SOUNDSYSTEM_H
+#define SOUNDSYSTEM_H
 
 #include <vector>
 #include <array>
 #include <cstdint>
 #include <memory>
 
-#include "audio/miniaudio.h"
+#include "lib/miniaudio.h"
 
 struct e_sound_t {
     uint32_t bdoffset;
@@ -100,4 +100,4 @@ void cleanupTicker();
 void initSound();
 void cleanupSound();
 
-#endif // BES_SS_H
+#endif // SOUNDSYSTEM_H

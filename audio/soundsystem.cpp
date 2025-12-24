@@ -1,6 +1,5 @@
 #include "audio/soundsystem.h"
-#include "lib/audio/adpcm.h"
-#include "lib/audio/bdutil.h"
+#include "audio/bd.h"
 
 #include <QFile>
 #include <QByteArray>
@@ -10,7 +9,7 @@
 #include <cstring>
 
 #define MINIAUDIO_IMPLEMENTATION
-#include "audio/miniaudio.h"
+#include "lib/miniaudio.h"
 
 ma_engine audioEngine;
 TickerSound tickerSound;
