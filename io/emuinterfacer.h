@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <algorithm>  // For std::min
 #include <cstring>    // For memcpy
+#include <QDebug>
 
 namespace pcsx2reader {
     bool read(uint32_t addr, void *out, uint32_t size);

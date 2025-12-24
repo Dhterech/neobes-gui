@@ -7,9 +7,10 @@ PINE::PCSX2 *ipc;
 bool IsEmuOpen() {
     if (!ipc) return false;
     try {
-        PINE::Shared::EmuStatus abc = ipc->Status();
-        return abc == 0;
-    } catch(...) {
+        std::unique_ptr<char[]> game_id(ipc->GetGameID());
+        return true;
+    } catch(PINE::PCSX2::IPCStatus status) {
+        qDebug() << "PINE returned " << status;
         return false;
     }
 }
