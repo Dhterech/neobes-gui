@@ -1,11 +1,12 @@
-#ifndef BES_SS_H
-#define BES_SS_H
+#ifndef SOUNDSYSTEM_H
+#define SOUNDSYSTEM_H
 
 #include <vector>
 #include <array>
 #include <cstdint>
-#include <AL/al.h>
-#include <AL/alc.h>
+#include <memory>
+
+#include "lib/miniaudio.h"
 
 struct e_sound_t {
     uint32_t bdoffset;
@@ -25,15 +26,45 @@ struct e_soundboard_t {
     std::array<std::array<uint8_t, 128>, 128> prog;
     struct {
         uint32_t len = 0;
-        char *bytes = nullptr;  // Raw pointer version
+        char *bytes = nullptr;
     } bd;
+
+    e_soundboard_t() = default;
     ~e_soundboard_t();
     void clear();
+
+    e_soundboard_t(const e_soundboard_t&) = delete;
+    e_soundboard_t& operator=(const e_soundboard_t&) = delete;
+
+    e_soundboard_t(e_soundboard_t&& other) noexcept {
+        sounds = std::move(other.sounds);
+        keys = std::move(other.keys);
+        prog = other.prog;
+        bd = other.bd;
+        other.bd.bytes = nullptr;
+        other.bd.len = 0;
+    }
+
+    e_soundboard_t& operator=(e_soundboard_t&& other) noexcept {
+        if (this != &other) {
+            clear();
+            sounds = std::move(other.sounds);
+            keys = std::move(other.keys);
+            prog = other.prog;
+            bd = other.bd;
+            other.bd.bytes = nullptr;
+            other.bd.len = 0;
+        }
+        return *this;
+    }
 };
 
 struct sound_t {
-    ALuint buffer = AL_NONE;
-    ALuint source = AL_NONE;
+    ma_audio_buffer audioBuffer;
+    ma_sound sound;
+    std::vector<int16_t> pcmData;
+    bool initialized = false;
+
     ~sound_t();
     void clear();
     void load(const e_soundboard_t &sb, const e_sound_t &snd);
@@ -41,10 +72,11 @@ struct sound_t {
 
 struct soundenv_t {
     uint32_t soundboardid;
-    std::vector<sound_t> sounds;
+    std::vector<std::shared_ptr<sound_t>> sounds;
     std::vector<ptrkey_t> keys;
     std::array<std::array<uint8_t, 128>, 128> prog;
     std::array<uint16_t, 128> lastkey;
+
     void clear();
     void load(const e_soundboard_t &sb);
     void play(int key);
@@ -52,11 +84,14 @@ struct soundenv_t {
 };
 
 struct TickerSound {
-    ALuint buffer = AL_NONE;
-    ALuint source = AL_NONE;
+    ma_audio_buffer audioBuffer;
+    ma_sound sound;
+    std::vector<int16_t> pcmData;
+    bool initialized = false;
 };
 
 extern TickerSound tickerSound;
+extern ma_engine audioEngine;
 
 void loadTicker();
 void playTicker();
@@ -65,4 +100,4 @@ void cleanupTicker();
 void initSound();
 void cleanupSound();
 
-#endif // BES_SS_H
+#endif // SOUNDSYSTEM_H

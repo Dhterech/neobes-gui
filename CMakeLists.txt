@@ -12,7 +12,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Require Qt6 and OpenAL
 find_package(Qt6 REQUIRED COMPONENTS Widgets Gui)
-find_package(OpenAL REQUIRED)
 
 # Define project sources
 set(PROJECT_SOURCES
@@ -20,16 +19,16 @@ set(PROJECT_SOURCES
     about.h
     about.ui
 
-    lib/io/pine.h
+    lib/pine/src/pine.h
+    lib/miniaudio.h
 
-    lib/audio/adpcm.cpp
-    lib/audio/adpcm.h
-    lib/audio/bdutil.cpp
-    lib/audio/bdutil.h
     audio/soundsystem.cpp
     audio/soundsystem.h
     audio/audioplayer.h
     audio/audioplayer.ui
+
+    audio/bd.h
+    audio/bd.cpp
 
     config.h
     main.cpp
@@ -64,5 +63,7 @@ qt_add_executable(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt6::Widgets
     Qt6::Gui
-    OpenAL::OpenAL
+    Threads::Threads # Miniaudio threads
+    dl               # Miniaudio load ALSA/PulseAudio symbols
+    m                # Miniaudio math
 )
