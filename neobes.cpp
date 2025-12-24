@@ -396,7 +396,11 @@ void neobes::ASelectRegion() {
     regionPicker.setComboBoxItems(regionList);
     regionPicker.setWindowTitle("Region select");
     regionPicker.setLabelText("Select the region");
-    CurrentRegion = regionPicker.exec();
+
+    if (regionPicker.exec() == QDialog::Accepted) {
+        QString selectedText = regionPicker.textValue();
+        CurrentRegion = regionList.indexOf(selectedText);
+    }
 }
 
 /* ABOUT */
