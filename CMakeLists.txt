@@ -19,17 +19,16 @@ set(PROJECT_SOURCES
     about.h
     about.ui
 
-    lib/io/pine.h
+    lib/pine/src/pine.h
+    lib/miniaudio.h
 
-    lib/audio/adpcm.cpp
-    lib/audio/adpcm.h
-    lib/audio/bdutil.cpp
-    lib/audio/bdutil.h
     audio/soundsystem.cpp
     audio/soundsystem.h
     audio/audioplayer.h
     audio/audioplayer.ui
-    audio/miniaudio.h
+
+    audio/bd.h
+    audio/bd.cpp
 
     config.h
     main.cpp

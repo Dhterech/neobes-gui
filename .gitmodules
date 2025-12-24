@@ -1,0 +1,3 @@
+[submodule "lib/pine"]
+	path = lib/pine
+	url = https://github.com/GovanifY/pine
