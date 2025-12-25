@@ -219,6 +219,10 @@ int neodata::LoadFromBes(QString fileName) {
 
 int neodata::SaveToEmu() {
     if(!pcsx2reader::IsEmuOpen()) return 1;
+
+    CurrentRegion = pcsx2reader::GetGameRegion();
+    if(CurrentRegion == -1) return 5;
+
     if(Modes.size() == 0 || modestage != StageInfo.name) { // If we don't have modes for this
         pcxs2GetModelist(StageInfo.stagemodelistbase, ModeSize); // Project File doesn't have modes
         modestage = StageInfo.name;
@@ -237,6 +241,9 @@ int neodata::SaveToEmu() {
 
 int neodata::LoadFromEmu() {
     if(!pcsx2reader::IsEmuOpen()) return 1;
+
+    CurrentRegion = pcsx2reader::GetGameRegion();
+    if(CurrentRegion == -1) return 5;
 
     projFileName = "New Project";
 

@@ -16,6 +16,14 @@ bool IsEmuOpen() {
     }
 }
 
+int GetGameRegion() {
+    if (!ipc) return false;
+    std::unique_ptr<char[]> raw_id(ipc->GetGameID());
+    QString gameId = QString::fromLatin1(raw_id.get());
+    const QStringList compatible = {"SCUS-97167", "SCPS-15017", "SCES-50408"};
+    return compatible.indexOf(gameId);
+}
+
 void SetupIPC() {
     ipc = new PINE::PCSX2();
 }

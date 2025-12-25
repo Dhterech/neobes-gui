@@ -3,8 +3,8 @@
 
 #include "types.h"
 #include <cstdint>
-#include <algorithm>  // For std::min
-#include <cstring>    // For memcpy
+#include <algorithm>
+#include <cstring>
 #include <QDebug>
 
 namespace pcsx2reader {
@@ -13,6 +13,7 @@ namespace pcsx2reader {
 
     bool IsEmuOpen();
     void SetupIPC();
+    int GetGameRegion();
 }
 
 #endif // EMUINTERFACER_H

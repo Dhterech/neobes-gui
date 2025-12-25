@@ -316,6 +316,9 @@ void neobes::ADownloadEmu()
     case 3:
         QMessageBox::critical(this, "Error on download", "Can't confirm a compatible stage! Please verify game region and if is paused on a actual stage.");
         break;
+    case 5:
+        QMessageBox::critical(this, "Error on download", "This is not a compatible game. Please use a retail copy of PaRappa the Rapper 2 (US/JP/PAL).");
+        break;
     }
 }
 
@@ -341,6 +344,9 @@ void neobes::AUploadEmu()
         break;
     case 3:
         QMessageBox::critical(this, "Error on upload", "This project is for another stage! Please verify compatibility and if is paused on the correct stage.");
+        break;
+    case 5:
+        QMessageBox::critical(this, "Error on upload", "This is not a compatible game. Please use a retail copy of PaRappa the Rapper 2 (US/JP/PAL).");
         break;
     default:
         QMessageBox::critical(this, "Error on upload", "NeoBES caused an error while uploading to PCSX2.");
