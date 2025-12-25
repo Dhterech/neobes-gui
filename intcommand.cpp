@@ -119,72 +119,76 @@ GUICommand intcommand::ConvertToGUI(commandbuffer_t command) {
     }
 
     switch(command.cmd_id) {
-    case 00: // "SETUP";
-        gui.arg1 = "Owner: " + handleOwners(command.arg1);
+        case 00: // "SETUP";
+            gui.arg1 = "Owner: " + handleOwners(command.arg1);
 
-        gui.arg2 = "Icon: " + job_setup_icon[command.arg2];
-        gui.arg4 = "Time: " + QString::number(command.arg4);
-        break;
-    case 1: // "LOAD_PLAY_RECORD";
-        gui.arg4 = "Record: " + handleRecord(command.arg4);
-        break;
-    case 2: // "SCORE"
-        gui.arg1 = "Rank: " + modesSingleP[command.arg1];
-
-        if(VSMode) {
-            gui.arg4 = "Player: " + handleOwners(command.arg4);
-        }
-        break;
-    case 3: // "SCENE_BETTER";
-    case 4: // "SCENE_COOLER";
-    case 5: // "SCENE_OOPS";
-    case 6: // "SCENE_WORSE";
-        gui.arg1 = "Rank: " + modesSingleP[command.arg1];
-        gui.arg4 = "Time: " + QString::number(command.arg4);
-        break;
-    case 7:
-    case 8: // "RETURN"; "END_STAGE";
-        // Doesn't seem to read anything directly afaik
-        //gui.arg1 = "Unknown";
-        //gui.arg4 = "Unknown";
-        break;
-    case 9: // "RUN_SUBJOB";
-        if(command.arg1 >= 0 || command.arg1 <= 17) {
-            gui.arg1 = subjobCommands[command.arg1];
-        } else {
-            gui.arg1 = "UNKNOWN SUBJOB";
-        }
-        //gui.arg4 = QString::number(command.arg4);
-
-        if(command.arg1 >= 5 && command.arg1 <= 8) { // "SCRSUBJ_SPU_ON"
-            gui.arg2 = "SoundBoard: " + QString::number(command.arg2);
-            gui.arg3 = "Number: " + QString::number(command.arg3);
-        }
-
-        if(command.arg1 == 16) { // "SCRSUBJ_TITLE"
-            gui.arg2 = "Dera: " + QString::number(command.arg2);
-            gui.arg3 = "Menderer: " + QString::number(command.arg1);
-        }
-
-        if(command.arg1 == 0xE) { // "SCRSUBJ_SPUTRANS"
+            gui.arg2 = "Icon: " + job_setup_icon[command.arg2];
+            gui.arg4 = "Time: " + QString::number(command.arg4);
+            break;
+        case 1: // "LOAD_PLAY_RECORD";
             gui.arg4 = "Record: " + handleRecord(command.arg4);
-        }
+            break;
+        case 2: // "SCORE"
+            if (command.arg1 >= 0 && command.arg1 < sizeof(examMode)/sizeof(examMode[0])) {
+                gui.arg1 = "Mode: " + examMode[command.arg1];
+            } else {
+                gui.arg1 = "Mode: " + QString::number(command.arg1);
+            }
 
-        if(command.arg1 == 0x12) { // "SCRSUBJ_LESSON"
-            gui.arg2 = subjob_displaylr[command.arg2];
-            gui.arg3 = "Time: " + QString::number(command.arg3);
-        }
+            if(VSMode) {
+                gui.arg4 = "Player: " + handleOwners(command.arg4);
+            }
+            break;
+        case 3: // "SCENE_BETTER";
+        case 4: // "SCENE_COOLER";
+        case 5: // "SCENE_OOPS";
+        case 6: // "SCENE_WORSE";
+            gui.arg1 = "Rank: " + modesSingleP[command.arg1];
+            gui.arg4 = "Time: " + QString::number(command.arg4);
+            break;
+        case 7:
+        case 8: // "RETURN"; "END_STAGE";
+            // Doesn't seem to read anything directly afaik
+            //gui.arg1 = "Unknown";
+            //gui.arg4 = "Unknown";
+            break;
+        case 9: // "RUN_SUBJOB";
+            if(command.arg1 >= 0 || command.arg1 <= 24) {
+                gui.arg1 = subjobCommands[command.arg1];
+            } else {
+                gui.arg1 = "UNKNOWN SUBJOB";
+            }
+            //gui.arg4 = QString::number(command.arg4);
 
-        if(command.arg1 == 0x16) { // "SCRSUBJ_SPU_OFF"
-            gui.arg2 = "SoundBoard: " + QString::number(command.arg2);
-        }
-        break;
-    case 0xA:
-    case 0xB:
-    case 0xC:
-    case 0xD:
-    case 0xE:
-        break;
+            if(command.arg1 >= 6 && command.arg1 <= 9) { // "SCRSUBJ_SPU_ON"
+                gui.arg2 = "SoundBoard: " + QString::number(command.arg2);
+                gui.arg3 = "Number: " + QString::number(command.arg3);
+            }
+
+            if(command.arg1 == 10) { // "SCRSUBJ_TITLE"
+                gui.arg2 = "Dera: " + QString::number(command.arg2);
+                gui.arg3 = "Menderer: " + QString::number(command.arg1);
+            }
+
+            if(command.arg1 == 0xE) {
+                gui.arg2 = "Record: " + handleRecord(command.arg2);
+            }
+
+            if(command.arg1 == 0x12) { // "SCRSUBJ_LESSON"
+                gui.arg2 = subjob_displaylr[command.arg2];
+                gui.arg3 = "Time: " + QString::number(command.arg3);
+            }
+
+            if(command.arg1 == 0x16) { // "SCRSUBJ_SPU_OFF"
+                gui.arg2 = "SoundBoard: " + QString::number(command.arg2);
+            }
+            break;
+        case 0xA:
+        case 0xB:
+        case 0xC:
+        case 0xD:
+        case 0xE:
+            break;
     }
     return gui;
 }
@@ -213,8 +217,8 @@ int intcommand::ConvertToNormal(QString guiText, commandbuffer_t job, int row, i
         return reverseHandleRecord(guiText);
     }
 
-    if(job.arg1 == 9) { // SCRRJ_SUB_JOB
-        if(col == 4 && job.arg2 == 0xE) { // SCRSUBJ_SPUTRANS
+    if(job.cmd_id == 9) { // SCRRJ_SUB_JOB
+        if(col == 2 && job.arg1 == 0xE) { // SCRSUBJ_SPUTRANS, stored in arg2
             return reverseHandleRecord(guiText);
         }
     }

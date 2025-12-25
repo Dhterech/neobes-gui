@@ -1,7 +1,6 @@
 #ifndef EMUINTERFACER_H
 #define EMUINTERFACER_H
 
-#include "lib/pine/src/pine.h"
 #include "types.h"
 #include <cstdint>
 #include <algorithm>  // For std::min
