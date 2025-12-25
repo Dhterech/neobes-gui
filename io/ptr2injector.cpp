@@ -126,6 +126,7 @@ bool pcsx2upload(std::vector<e_suggestrecord_t> Records, std::vector<scenemode_t
  
     for(int i = 0; i < ModeSize; i++) {
         Modes[i].ptr_scenecommands = uploadPos;
+        Modes[i].count_scenecommands = ModeCommands[i].size();
         for(int k = 0; k < ModeCommands[i].size(); k++) {UPLOAD(uploadPos, ModeCommands[i][k]);}
         UPLOAD_NOMOVE(StageInfo.stagemodelistbase + (i * sizeof(scenemode_t)), Modes[i]);
     }

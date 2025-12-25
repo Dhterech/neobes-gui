@@ -605,7 +605,8 @@ void neobes::drawCommands() { // NOTE TO JOO: I left it as it is due to extreme 
     int curRow = 0;
 
     ui->comTable->blockSignals(true);
-    ui->comTable->setRowCount(ModeCommands[currentCommandSelect].size());
+    int size = ModeCommands[currentCommandSelect].size() > 0 ? ModeCommands[currentCommandSelect].size() : 0;
+    ui->comTable->setRowCount(size);
     for(commandbuffer_t &command : ModeCommands[currentCommandSelect]) {
         GUICommand gui = intcommand::ConvertToGUI(command);
         QTableWidgetItem *ctyp = new QTableWidgetItem(gui.commandType);
@@ -763,7 +764,6 @@ void neobes::ACommandCreate() {
     newCom.arg4 = 0;
 
     ModeCommands[curComSel].insert(ModeCommands[curComSel].begin() + curRow, newCom);
-    Modes[curComSel].count_scenecommands++;
     drawCommands();
 }
 
@@ -773,7 +773,6 @@ void neobes::ACommandDelete() {
     int curRow = ui->comTable->currentRow();
 
     ModeCommands[curComSel].erase(ModeCommands[curComSel].begin() + curRow);
-    Modes[curComSel].count_scenecommands--;
     drawCommands();
 }
 
