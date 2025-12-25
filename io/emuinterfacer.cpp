@@ -29,7 +29,6 @@ void SetupIPC() {
 }
 
 bool read(uint32_t addr, void *out, uint32_t size) {
-    //if (!ipc || !out || size == 0) return false; // Validate input
     if(!ipc) return false;
 
     uint8_t *outPtr = reinterpret_cast<uint8_t *>(out);
@@ -56,7 +55,6 @@ bool read(uint32_t addr, void *out, uint32_t size) {
 }
 
 bool write(uint32_t addr, void *data, uint32_t size) {
-    //if (!ipc || !data || size == 0) return false; // Validate input
     if(!ipc) return false;
 
     uint8_t *dataPtr = reinterpret_cast<uint8_t *>(data);
