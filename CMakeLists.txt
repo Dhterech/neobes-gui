@@ -64,6 +64,10 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt6::Widgets
     Qt6::Gui
     Threads::Threads # Miniaudio threads
-    dl               # Miniaudio load ALSA/PulseAudio symbols
-    m                # Miniaudio math
 )
+
+if(WIN32)
+    target_link_libraries(${PROJECT_NAME} PRIVATE ws2_32)
+else()
+    target_link_libraries(${PROJECT_NAME} PRIVATE dl m)
+endif()

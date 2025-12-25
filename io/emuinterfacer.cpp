@@ -1,4 +1,5 @@
 #include "emuinterfacer.h"
+#include "lib/pine/src/pine.h"
 
 namespace pcsx2reader {
 
