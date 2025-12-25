@@ -13,6 +13,7 @@ bool VSMode;
 bool PALMode;
 bool SUBMode;
 QString logHistory;
+QString projFileName;
 
 int subcount; // remove later
 QString modestage; // fixme: you can mix other stages info
@@ -146,6 +147,9 @@ int neodata::LoadFromBes(QString fileName) {
     rawFile.open(fileName.toUtf8(), std::ios_base::in | std::ios_base::binary);
     if(!rawFile.is_open()) return errno;
 
+    QFileInfo fileInfo(fileName);
+    projFileName = fileInfo.fileName();
+
     CloseProject();
 
     READ(tmpu32); CurrentStage = tmpu32;
@@ -233,6 +237,9 @@ int neodata::SaveToEmu() {
 
 int neodata::LoadFromEmu() {
     if(!pcsx2reader::IsEmuOpen()) return 1;
+
+    projFileName = "New Project";
+
     Log(" Status: Reading current stage...");
 
     pcsx2reader::read(CURRENT_STAGE[CurrentRegion], &CurrentStage, 1); CurrentStage--;

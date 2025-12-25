@@ -261,8 +261,9 @@ void neobes::ALoadProject()
 
     int result = neodata::LoadFromBes(fileName);
     if(result == 0) {
-        drawEditorGUI();
         hasEdited = false;
+        afterProjLoad();
+        drawEditorGUI();
         neodata::Log("Loaded project file successfully.");
     }
     else QMessageBox::critical(this, "Error on project load", strerror(result));
@@ -303,6 +304,7 @@ void neobes::ADownloadEmu()
     switch(neodata::LoadFromEmu()) {
     case 0:
         hasEdited = false;
+        afterProjLoad();
         drawEditorGUI();
         break;
     case 1:
@@ -427,6 +429,19 @@ void neobes::changeMenu() {
 void neobes::drawMenuGUI() {
     ui->stackedWidget->setCurrentIndex(0);
     ui->actionChangeMenu->setText("Go to Editor");
+}
+
+void neobes::afterProjLoad() {
+    QString stageNumber = "";
+    if(CurrentStage < 9) {
+        stageNumber = QString::number(CurrentStage + 1);
+    } else {
+        stageNumber = QString::number(CurrentStage - 10 + 1) + "-VS";
+    }
+    QWidget::setWindowTitle("NeoBES - S" + stageNumber + ": " + projFileName);
+
+    CurrentRecord = 0;
+    CurrentVariant = 0;
 }
 
 QString drawRecord(int owner, int start, int length, int interval, int cursorPos) {

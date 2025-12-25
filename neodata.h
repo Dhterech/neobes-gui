@@ -11,6 +11,7 @@
 #include <fstream>
 
 #include <QDebug>
+#include <QFileInfo>
 
 extern std::vector<e_soundboard_t> Soundboards;
 extern std::vector<e_suggestrecord_t> Records;
@@ -26,6 +27,7 @@ extern bool VSMode;
 extern bool PALMode;
 extern bool SUBMode;
 extern QString logHistory;
+extern QString projFileName;
 
 class neodata {
 public:

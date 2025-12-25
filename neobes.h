@@ -67,6 +67,7 @@ private:
     Ui::neobes *ui;
     int displaySaveDlg();
     void importStageInfo();
+    void afterProjLoad();
     void updateLog();
 
     void drawButtonProperties();
