@@ -20,7 +20,7 @@ int GetGameRegion() {
     if (!ipc) return false;
     std::unique_ptr<char[]> raw_id(ipc->GetGameID());
     QString gameId = QString::fromLatin1(raw_id.get());
-    const QStringList compatible = {"SCUS-97167", "SCPS-15017", "SCES-50408"};
+    const QStringList compatible = {"SCUS-97167", "SCES-50408", "SCPS-15017"};
     return compatible.indexOf(gameId);
 }
 
