@@ -199,10 +199,11 @@ void ps2LineToEditor(const suggestline_t &ps2, const suggestline_t_pal &ps2p, e_
     editor.oopscount = (PALMode ? ps2p.oopscount : ps2.oopscount);
 
     editor.coolmodethreshold = (PALMode ? ps2p.coolmodethreshold : ps2.coolmodethreshold);
-    for(int s = 0; s < (PALMode ? 7 : 4); s++) {editor.localisations[s] = (PALMode ? ps2p.localisations[s] : ps2.localisations[s]);}
+    for(int c = 0; c < 2; c++) {editor.chan[c] = (PALMode ? ps2p.chan[c] : ps2.chan[c]);}
+    for(int s = 0; s < (PALMode ? 5 : 2); s++) {editor.ptr_subtitles[s] = (PALMode ? ps2p.ptr_subtitles[s] : ps2.ptr_subtitles[s]);}
     editor.timestamp_start = (PALMode ? ps2p.timestamp_start : ps2.timestamp_start);
     editor.timestamp_end = (PALMode ? ps2p.timestamp_end : ps2.timestamp_end);
-    editor.vs_count = (PALMode ? ps2p.vs_count : ps2.vs_count);
+    editor.type = (PALMode ? ps2p.type : ps2.type);
 }
 
 void ps2VariantToEditor(const suggestvariant_t &ps2, e_suggestvariant_t &editor) {

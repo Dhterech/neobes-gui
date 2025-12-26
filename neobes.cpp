@@ -8,36 +8,25 @@
 #include <QCloseEvent>
 
 bool isMenu = true;
-int owners[3] {0x2, 0x4, 0x8};
-int numowners = 3;
 
 int cursorpos = 0;
 int cursorowner = 0;
 int precpos = 0;
 
-int ownerSetting[3] = {0x2, 0x4, 0x8};
+int numowners = 3;
+PLAYER_CODE owners[3] = {PLAYER_CODE::PCODE_TEACHER, PLAYER_CODE::PCODE_PARA, PLAYER_CODE::PCODE_BOXY};
 
-struct ownerEntry {
-    QString name;
-    int value;
+static const QMap<PLAYER_CODE, QString> ownerNames = {
+    {PLAYER_CODE::PCODE_NONE,    "None"},
+    {PLAYER_CODE::PCODE_TEACHER, "Teacher"},
+    {PLAYER_CODE::PCODE_PARA,    "PaRappa"},
+    {PLAYER_CODE::PCODE_BOXY,    "SFX"},
+    {PLAYER_CODE::PCODE_MOVE,    "Scene"}
 };
 
-ownerEntry ownerNames[] = {
-    {"Unknown", 0},
-    {"None", 0x1},
-    {"Teacher", 0x2},
-    {"PaRappa", 0x4},
-    {"SFX", 0x8},
-    {"Scene", 0x10}
-};
 
-QString getOwnerName(int hexValue) {
-    for (const auto& entry : ownerNames) {
-        if (entry.value == hexValue) {
-            return entry.name;
-        }
-    }
-    return "Unknown";
+QString getOwnerName(PLAYER_CODE code) {
+    return ownerNames.value(code, "Unknown");
 }
 
 QString buttonsUIResNot[] {
@@ -427,7 +416,7 @@ void neobes::afterProjLoad() {
     CurrentVariant = 0;
 }
 
-QString drawRecord(int owner, int start, int length, int interval, int cursorPos) {
+QString drawRecord(PLAYER_CODE owner, int start, int length, int interval, int cursorPos) {
     QString drawnRec;
     suggestbutton_t button;
 
@@ -489,18 +478,18 @@ void neobes::updateButtonProperties(int row, int column) {
     QString valueChanged = ui->butProperty->item(row, column)->text();
 
     if (column == 0) { // Sound
-        uint16_t soundId = (uint16_t)valueChanged.toInt();
+        int16_t soundId = (int16_t)valueChanged.toInt();
 
         button->sounds[row].soundid = soundId;
         audio->playSound(soundId);
     }
     if (column == 1) { // Animation
-        uint16_t animId = (uint16_t)valueChanged.toInt();
+        int32_t animId = (int32_t)valueChanged.toInt();
 
         button->sounds[row].animationid = animId;
     }
     if (column == 2) { // Timing
-        uint32_t timing = (uint32_t)valueChanged.toInt();
+        int32_t timing = (int32_t)valueChanged.toInt();
 
         button->sounds[row].relativetime = timing;
     }
@@ -552,7 +541,7 @@ void neobes::drawEditorGUI() {
     updateLog();
 
     for(int curOwner = 0; curOwner < numowners; curOwner++) {
-        textGUI += "<h2>" + ownerNames[curOwner+2].name + "</h2>"; // FIXME: Calculate properly
+        textGUI += "<h2>" + getOwnerName(owners[curOwner]) + "</h2>";
         textGUI += "" + drawRecord(owners[curOwner], 0, Records[CurrentRecord].lengthinsubdots, 24, curOwner == cursorowner ? cursorpos : -1) + "<br>";
     }
     if(SettingsManager::instance().hudCenterVisual()) textGUI = QString("<center>%1</center><br>").arg(textGUI);

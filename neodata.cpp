@@ -99,10 +99,10 @@ int neodata::SaveToBes(QString fileName) {
             tmpi32 = variant.islinked ? variant.linknum : -1; WRITE(tmpi32);
             tmpu32 = variant.lines.size(); WRITE(tmpu32);
             for(e_suggestline_t &line : variant.lines) {
-                WRITE(line.vs_count);
+                WRITE(line.type);
                 WRITE(line.coolmodethreshold);
                 if(SUBMode) {for(int susb = 0; susb < subcount; susb++) {
-                        WRITE(line.localisations[susb]);
+                        WRITE(line.ptr_subtitles[susb]);
                     }}
                 WRITE(line.owner);
                 WRITE(line.timestamp_start);
@@ -158,7 +158,6 @@ int neodata::LoadFromBes(QString fileName) {
     CloseProject();
 
     READ(tmpu32); CurrentStage = tmpu32;
-    if(CurrentRegion == 2 && SettingsManager::instance().bhvDebugJP()) CurrentRegion = 3;
     ImportStageInfo();
 
     for(int i = 0; i < 9; i++) loadSceneCommands();
@@ -174,10 +173,10 @@ int neodata::LoadFromBes(QString fileName) {
 
             READ(tmpu32); variant.lines.resize(tmpu32);
             for(e_suggestline_t &line : variant.lines) {
-                READ(line.vs_count);
+                READ(line.type);
                 READ(line.coolmodethreshold);
                 if(SUBMode) {for(int susb = 0; susb < subcount; susb++) {
-                        READ(line.localisations[susb]);
+                        READ(line.ptr_subtitles[susb]);
                     }}
                 READ(line.owner);
                 READ(line.timestamp_start);
@@ -227,6 +226,7 @@ int neodata::SaveToEmu() {
     if(!pcsx2reader::IsEmuOpen()) return 1;
 
     CurrentRegion = pcsx2reader::GetGameRegion();
+    if(CurrentRegion == 2 && SettingsManager::instance().bhvDebugJP()) CurrentRegion = 3;
     if(CurrentRegion == -1) return 5;
 
     if(Modes.size() == 0 || modestage != StageInfo.name) { // If we don't have modes for this

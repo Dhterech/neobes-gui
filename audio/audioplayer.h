@@ -47,7 +47,7 @@ public:
         for (const e_suggestline_t &line : variant.lines) {
             for (const suggestbutton_t &button : line.buttons) {
                 for (const soundentry_t &se : button.sounds) {
-                    if (se.soundid == 0xFFFF) continue;
+                    if (se.soundid == -1) continue;
                     playtoken_t token;
                     token.when = (spsd * double(button.timestamp + line.timestamp_start)) +
                                  (double(se.relativetime) / double(GAME_FRAMERATE[CurrentRegion]));
