@@ -9,9 +9,9 @@ uint32_t ModeSize;
 int OopsSize;
 int CurrentRegion;
 int CurrentStage;
-bool VSMode;
-bool PALMode;
-bool SUBMode;
+bool VSMode = false;
+bool PALMode = false;
+bool SUBMode = false;
 QString logHistory;
 QString projFileName;
 
@@ -53,6 +53,7 @@ uint32_t neodata::CalcAvailableStorage() {
 
 void neodata::ImportStageInfo() {
     int tmpReg = (CurrentRegion == 2 ? 0 : CurrentRegion); // NTSC-J == NTSC
+    PALMode = CurrentRegion == 2;
     StageInfo.name = stages[CurrentStage].name;
     StageInfo.bpm = stages[CurrentStage].bpm;
     StageInfo.stagemodelistbase = stages[CurrentStage].regions[tmpReg].stagemodelistbase;

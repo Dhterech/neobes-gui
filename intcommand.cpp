@@ -75,7 +75,7 @@ void intcommand::reverseHandleSceneCommand(GUICommand &gui, uint16_t &rank, uint
         }
     }
 
-    time = gui.arg4.mid(timePrefix.length()).toInt();
+    time = gui.arg4.sliced(timePrefix.length()).toInt();
 }
 
 QString intcommand::handleRecord(int pointer) {
@@ -218,7 +218,7 @@ int intcommand::ConvertToNormal(QString guiText, commandbuffer_t job, int row, i
     }
 
     if(job.cmd_id == 9) { // SCRRJ_SUB_JOB
-        if(col == 2 && job.arg1 == 0xE) { // SCRSUBJ_SPUTRANS, stored in arg2
+        if(col == 2 && job.arg1 == 0xE) { // SCRSUBJ_SPUTRANS
             return reverseHandleRecord(guiText);
         }
     }

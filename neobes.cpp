@@ -17,15 +17,6 @@ int precpos = 0;
 
 int ownerSetting[3] = {0x2, 0x4, 0x8};
 
-/*QString ownerNames[] = {
-    "None",
-    "???", // 0x1?
-    "Teacher", //0x2
-    "PaRappa", //0x4
-    "SFX", // 0x8
-    "Scene" // 0x10?
-};*/
-
 struct ownerEntry {
     QString name;
     int value;
@@ -90,7 +81,7 @@ neobes::neobes(QWidget *parent)
 
     updateLog();
     drawMenuGUI();
-    this->setFocusPolicy(Qt::StrongFocus); // may help may not
+    this->setFocusPolicy(Qt::StrongFocus);
 
     ui->variantInput->setMaximum(16);
 
@@ -529,7 +520,7 @@ void neobes::updateButtonProperties(int row, int column) {
 void neobes::drawLineProperties() {
     int count = 0;
     ui->lineOptions->setRowCount(Records[CurrentRecord].variants[MentionedVariant].lines.size());
-    for(e_suggestline_t line : Records[CurrentRecord].variants[MentionedVariant].lines) {
+    for(const e_suggestline_t &line : Records[CurrentRecord].variants[MentionedVariant].lines) {
         QTableWidgetItem *coolTres = new QTableWidgetItem(QString::number((int32_t)line.coolmodethreshold));
         QTableWidgetItem *ownerNam = new QTableWidgetItem(getOwnerName(line.owner));
         QTableWidgetItem *subtitle = new QTableWidgetItem("Placeholder");
