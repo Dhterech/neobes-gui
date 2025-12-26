@@ -190,7 +190,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                </widget>
               </item>
               <item>
-               <widget class="QToolButton" name="selregBtn">
+               <widget class="QToolButton" name="settingsBtn">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
                   <horstretch>0</horstretch>
@@ -198,11 +198,11 @@ li.checked::marker { content: &quot;\2612&quot;; }
                  </sizepolicy>
                 </property>
                 <property name="text">
-                 <string>Change Region</string>
+                 <string>Settings</string>
                 </property>
                 <property name="icon">
                  <iconset resource="resources.qrc">
-                  <normaloff>:/menu/res/menu/regchg.png</normaloff>:/menu/res/menu/regchg.png</iconset>
+                  <normaloff>:/menu/res/menu/config.png</normaloff>:/menu/res/menu/config.png</iconset>
                 </property>
                 <property name="iconSize">
                  <size>
@@ -729,7 +729,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <addaction name="actionLink"/>
     <addaction name="actionLinkAll"/>
     <addaction name="separator"/>
-    <addaction name="actionChangeRegion"/>
+    <addaction name="actionSettings"/>
    </widget>
    <widget class="QMenu" name="menuPlayback">
     <property name="title">
@@ -876,7 +876,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
   </action>
   <action name="actionChangeMenu">
    <property name="icon">
-    <iconset theme="QIcon::ThemeIcon::DocumentProperties"/>
+    <iconset theme="QIcon::ThemeIcon::MediaPlaylistRepeat"/>
    </property>
    <property name="text">
     <string>Show Menu</string>
@@ -888,12 +888,15 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <string>Esc</string>
    </property>
   </action>
-  <action name="actionChangeRegion">
+  <action name="actionSettings">
    <property name="icon">
-    <iconset theme="QIcon::ThemeIcon::ViewRefresh"/>
+    <iconset theme="QIcon::ThemeIcon::DocumentProperties"/>
    </property>
    <property name="text">
-    <string>Change Region</string>
+    <string>Settings</string>
+   </property>
+   <property name="toolTip">
+    <string>Change options in the Settings</string>
    </property>
   </action>
   <action name="actionExit">
@@ -958,9 +961,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
    </hints>
   </connection>
   <connection>
-   <sender>selregBtn</sender>
+   <sender>settingsBtn</sender>
    <signal>clicked()</signal>
-   <receiver>actionChangeRegion</receiver>
+   <receiver>actionSettings</receiver>
    <slot>trigger()</slot>
    <hints>
     <hint type="sourcelabel">

@@ -27,11 +27,13 @@ public:
         return _instance;
     }
 
+    void save() { m_settings->sync(); }
+
     /* HUD */
     void setHudCenterVisual(bool centerVisual) { m_settings->setValue("hudCenterVisual", centerVisual); }
     void setHudFirstRecVarOnLoad(bool firstRecVarReset) { m_settings->setValue("hudFirstRecVarOnLoad", firstRecVarReset); }
     void setHudEscapeLines(bool escapeLines) { m_settings->setValue("hudEscapeLines", escapeLines); }
-    void setHudIconSize(int iconSize) { m_settings->setValue("hudCenterVisual", iconSize); }
+    void setHudIconSize(int iconSize) { m_settings->setValue("hudIconSize", iconSize); }
 
     bool hudCenterVisual() const { return m_settings->value("hudCenterVisual", true).toBool(); }
     bool hudFirstRecVarOnLoad() const { return m_settings->value("hudFirstRecVarOnLoad", true).toBool(); }

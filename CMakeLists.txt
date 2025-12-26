@@ -57,6 +57,7 @@ set(PROJECT_SOURCES
 # Add executable for Qt6
 qt_add_executable(${PROJECT_NAME}
     ${PROJECT_SOURCES}
+    settings.h settings.cpp settings.ui
 )
 
 # Link necessary libraries

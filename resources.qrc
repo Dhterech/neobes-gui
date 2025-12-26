@@ -6,6 +6,7 @@
         <file>res/menu/regchg.png</file>
         <file>res/menu/emudown.png</file>
         <file>res/menu/besproj.png</file>
+        <file>res/menu/config.png</file>
     </qresource>
     <qresource prefix="/">
         <file>res/neobes.ico</file>

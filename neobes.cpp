@@ -86,7 +86,7 @@ neobes::neobes(QWidget *parent)
     ui->variantInput->setMaximum(16);
 
     connect(ui->actionChangeMenu, &QAction::triggered, this, &neobes::changeMenu);
-    connect(ui->actionChangeRegion, &QAction::triggered, this, &neobes::ASelectRegion);
+    connect(ui->actionSettings, &QAction::triggered, this, &neobes::ASettingsGUI);
 
     connect(ui->actionLoad, &QAction::triggered, this, &neobes::ALoadProject);
     connect(ui->actionSave, &QAction::triggered, this, &neobes::ASaveProject);
@@ -381,22 +381,11 @@ void neobes::AUploadOLM()
     };
 }
 
-/* REGION SELECT */
+/* SETTINGS */
 
-void neobes::ASelectRegion() {
-    QInputDialog regionPicker;
-    QStringList regionList;
-    regionList << "NTSC-U" << "PAL" << "NTSC-J";
-
-    regionPicker.setOptions(QInputDialog::UseListViewForComboBoxItems);
-    regionPicker.setComboBoxItems(regionList);
-    regionPicker.setWindowTitle("Region select");
-    regionPicker.setLabelText("Select the region");
-
-    if (regionPicker.exec() == QDialog::Accepted) {
-        QString selectedText = regionPicker.textValue();
-        CurrentRegion = regionList.indexOf(selectedText);
-    }
+void neobes::ASettingsGUI() {
+    Settings *settings = new Settings();
+    settings->exec();
 }
 
 /* ABOUT */

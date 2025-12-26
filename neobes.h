@@ -9,6 +9,7 @@
 #include "io/emuinterfacer.h"
 #include "io/ptr2reader.h"
 #include "config.h"
+#include "settings.h"
 #include "neodata.h"
 
 QT_BEGIN_NAMESPACE
@@ -50,7 +51,7 @@ private slots:
     void AUploadEmu();
     void ADownloadEmu();
 
-    void ASelectRegion();
+    void ASettingsGUI();
     void AAboutGUI();
     void drawEditorGUI();
 
