@@ -15,9 +15,6 @@ int cursorpos = 0;
 int cursorowner = 0;
 int precpos = 0;
 
-/* Configs */
-bool escapeEditorLines = true;
-bool centerEditorLines = true;
 int ownerSetting[3] = {0x2, 0x4, 0x8};
 
 /*QString ownerNames[] = {
@@ -455,7 +452,8 @@ QString drawRecord(int owner, int start, int length, int interval, int cursorPos
     suggestbutton_t button;
 
     QString cursor = "<b style=\"background-color: " + accentColor + "\">%1</b>";
-    QString iconStart = "<img src=\"%1\" width=24>";
+    QString iconStart = "<img src=\"%1\" width=" + QString::number(SettingsManager::instance().hudIconSize()) + ">";
+    bool escapeEditorLines = SettingsManager::instance().hudEscapeLines();
 
     e_suggestvariant_t &variant = Records[CurrentRecord].variants[MentionedVariant];
     for (int dot = start; dot < start + length; dot += interval) {
@@ -577,7 +575,7 @@ void neobes::drawEditorGUI() {
         textGUI += "<h2>" + ownerNames[curOwner+2].name + "</h2>"; // FIXME: Calculate properly
         textGUI += "" + drawRecord(owners[curOwner], 0, Records[CurrentRecord].lengthinsubdots, 24, curOwner == cursorowner ? cursorpos : -1) + "<br>";
     }
-    if(centerEditorLines) textGUI = QString("<center>%1</center><br>").arg(textGUI);
+    if(SettingsManager::instance().hudCenterVisual()) textGUI = QString("<center>%1</center><br>").arg(textGUI);
 
     textGUI += "<h3>Precision</h3><br>" + drawRecord(owners[cursorowner], cursorpos * 24, 24, 1, cursorpos * 24 + precpos);
 
