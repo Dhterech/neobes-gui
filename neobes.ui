@@ -95,7 +95,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
             <widget class="QLabel" name="label">
              <property name="maximumSize">
               <size>
-               <width>550</width>
+               <width>505</width>
                <height>125</height>
               </size>
              </property>
