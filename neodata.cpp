@@ -18,9 +18,10 @@ QString projFileName;
 int subcount; // remove later
 QString modestage; // fixme: you can mix other stages info
 
-const int GAME_FRAMERATE[3] = {60, 50, 60};
-const int RESOURCE_LIST_BASE[3] = {0x1C49480, 0x1C46100, 0x1C598e80};
-const int CURRENT_STAGE[3] = {0x386930, 0x1C63A74, 0x396DCC};
+// USA PAL JP JP-PROTO
+const int GAME_FRAMERATE[4] = {60, 50, 60, 60};
+const int RESOURCE_LIST_BASE[4] = {0x1C49480, 0x1C46100, 0x1C598e80, 0x1C5B380};
+const int CURRENT_STAGE[4] = {0x386930, 0x1C63A74, 0x396DCC, 0x3998dc};
 
 void neodata::Log(QString string) {
     logHistory += string + "\n";
@@ -51,8 +52,11 @@ uint32_t neodata::CalcAvailableStorage() {
     return size + OopsSize;
 }
 
+#include "config.h"
 void neodata::ImportStageInfo() {
     int tmpReg = (CurrentRegion == 2 ? 0 : CurrentRegion); // NTSC-J == NTSC
+    if (CurrentRegion == 3) tmpReg = 2;
+
     PALMode = CurrentRegion == 1;
     StageInfo.name = stages[CurrentStage].name;
     StageInfo.bpm = stages[CurrentStage].bpm;
@@ -154,6 +158,7 @@ int neodata::LoadFromBes(QString fileName) {
     CloseProject();
 
     READ(tmpu32); CurrentStage = tmpu32;
+    if(CurrentRegion == 2 && SettingsManager::instance().bhvDebugJP()) CurrentRegion = 3;
     ImportStageInfo();
 
     for(int i = 0; i < 9; i++) loadSceneCommands();
@@ -249,6 +254,9 @@ int neodata::LoadFromEmu() {
     projFileName = "New Project";
 
     Log(" Status: Reading current stage...");
+
+    // JP Specific fixes
+    if(CurrentRegion == 2 && SettingsManager::instance().bhvDebugJP()) CurrentRegion = 3;
 
     pcsx2reader::read(CURRENT_STAGE[CurrentRegion], &CurrentStage, 1); CurrentStage--;
     if(CurrentStage < 0 || CurrentStage > 18) return 3;

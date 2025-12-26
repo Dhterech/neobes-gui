@@ -34,6 +34,7 @@ void Settings::loadSettings()
 
     // Behaviour Tab
     ui->chkKeepSubtitles->setChecked(settings.bhvKeepSubtitles());
+    ui->chkJPDebug->setChecked(settings.bhvDebugJP());
 
     // History Tab
     refreshHistory();
@@ -51,6 +52,7 @@ void Settings::saveSettings()
 
     // Behaviour Tab
     settings.setBhvKeepSubtitles(ui->chkKeepSubtitles->isChecked());
+    settings.setBhvDebugJP(ui->chkJPDebug->isChecked());
 
     settings.save();
     this->accept();

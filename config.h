@@ -42,8 +42,10 @@ public:
 
     /* Behaviour */
     void setBhvKeepSubtitles(bool keepSubs) { m_settings->setValue("bhvKeepSubtitles", keepSubs); }
+    void setBhvDebugJP(bool forceRegion) { m_settings->setValue("bhvJul12Region", forceRegion); }
 
     bool bhvKeepSubtitles() const { return m_settings->value("bhvKeepSubtitles", false).toBool(); }
+    bool bhvDebugJP() const { return m_settings->value("bhvJul12Region", false).toBool(); }
 
     /* File History */
     QList<FileHistory> getHistory() {

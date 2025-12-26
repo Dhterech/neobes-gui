@@ -1,6 +1,6 @@
 #include "ptr2stages.h"
 
-// 0 USA, 1 PAL
+// 0 USA, 1 PAL, 2 JP-DEBUG
 
 stageinfo_t stages[18] = {
     {
@@ -10,6 +10,7 @@ stageinfo_t stages[18] = {
         {
             {0x01D2A848, 0x01CD3968, 0x120},
             {0x01D31988, 0x01CD4908, 0x120},
+            {0x01D2A838, 0x01CD3958, 0x120}
         }
     },
     {
