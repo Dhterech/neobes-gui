@@ -538,6 +538,7 @@ void neobes::drawEditorGUI() {
     ui->actionChangeMenu->setText("Go to Menu");
     drawCommands();
     QString textGUI = Records[CurrentRecord].variants[CurrentVariant].islinked ? QString("Linked to %1<br>").arg(Records[CurrentRecord].variants[CurrentVariant].linknum) : "<br>";
+    MentionedVariant = Records[CurrentRecord].variants[CurrentVariant].islinked ? Records[CurrentRecord].variants[CurrentVariant].linknum : CurrentVariant;
     updateLog();
 
     for(int curOwner = 0; curOwner < numowners; curOwner++) {
@@ -655,7 +656,6 @@ void neobes::handleArrowKeys(bool lr, int inc) {
     }
     else if(!lr && CurrentVariant+inc >= 0 && CurrentVariant+inc < 17) {
         CurrentVariant += inc;
-        MentionedVariant = Records[CurrentRecord].variants[CurrentVariant].islinked ? Records[CurrentRecord].variants[CurrentVariant].linknum : CurrentVariant;
     }
 }
 
