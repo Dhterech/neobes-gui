@@ -754,6 +754,13 @@ void neobes::ALinkVariant(bool linkAll)
     int linkId = QInputDialog::getInt(this, tr("Link Variant"), tr("Type the variant to link to"), 0, 0, 16);
     if(linkId == -1) return; // User Cancel
 
+    if(Records[CurrentRecord].variants[linkId].islinked) {
+        QMessageBox::warning(this, "Link Variant", "You can't link a linked variant!");
+        neodata::Log("Can't link linked variant!");
+        updateLog();
+        return;
+    }
+
     if(linkAll) {
         for(int i = 0; i < 17; i++) {
             hasEdited = true;
@@ -762,12 +769,6 @@ void neobes::ALinkVariant(bool linkAll)
     } else {
         if(linkId == CurrentVariant) {
             linkId = -1; // Unlink
-        }
-        else if(Records[CurrentRecord].variants[linkId].islinked) {
-            QMessageBox::warning(this, "Link Variant", "You can't link a linked variant!");
-            neodata::Log("Can't link linked variant!");
-            updateLog();
-            return;
         }
 
         hasEdited = true;
