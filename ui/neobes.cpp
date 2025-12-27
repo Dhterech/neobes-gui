@@ -539,6 +539,7 @@ void neobes::drawEditorGUI() {
     drawCommands();
     QString textGUI = Records[CurrentRecord].variants[CurrentVariant].islinked ? QString("Linked to %1<br>").arg(Records[CurrentRecord].variants[CurrentVariant].linknum) : "<br>";
     MentionedVariant = Records[CurrentRecord].variants[CurrentVariant].islinked ? Records[CurrentRecord].variants[CurrentVariant].linknum : CurrentVariant;
+    audio->loadSoundDB(Records[CurrentRecord].soundboardid - 1);
     updateLog();
 
     for(int curOwner = 0; curOwner < numowners; curOwner++) {
@@ -652,7 +653,6 @@ void neobes::handleDisplayClick() {
 void neobes::handleArrowKeys(bool lr, int inc) {
     if(lr && CurrentRecord+inc >= 0 && CurrentRecord+inc < Records.size()) {
         CurrentRecord += inc;
-        audio->loadSoundDB(Records[CurrentRecord].soundboardid - 1);
     }
     else if(!lr && CurrentVariant+inc >= 0 && CurrentVariant+inc < 17) {
         CurrentVariant += inc;
@@ -792,6 +792,7 @@ void neobes::ASetSoundboard()
     }
 
     Records[CurrentRecord].soundboardid = sbId;
+    audio->loadSoundDB(Records[CurrentRecord].soundboardid - 1);
 }
 
 void neobes::APlayVariant(bool ticker) {
