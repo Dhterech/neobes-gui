@@ -10,36 +10,38 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Require Qt6 and OpenAL
+# Require Qt6
 find_package(Qt6 REQUIRED COMPONENTS Widgets Gui)
 
 # Define project sources
 set(PROJECT_SOURCES
-    about.cpp
-    about.h
-    about.ui
-
-    lib/pine/src/pine.h
-    lib/miniaudio.h
-
-    audio/soundsystem.cpp
-    audio/soundsystem.h
-    audio/audioplayer.h
-    audio/audioplayer.ui
-
-    audio/bd.h
-    audio/bd.cpp
-
-    config.h
     main.cpp
-    neobes.cpp
-    neobes.h
-    neobes.ui
+    config.h
+    types.h
     neodata.cpp
     neodata.h
+    job.cpp
+    job.h
 
-    data/ptr2stages.cpp
-    data/ptr2stages.h
+    ui/about.cpp
+    ui/about.h
+    ui/about.ui
+    ui/neobes.cpp
+    ui/neobes.h
+    ui/neobes.ui
+    ui/settings.cpp
+    ui/settings.h
+    ui/settings.ui
+
+    audio/soundmanager.cpp
+    audio/soundmanager.h
+    audio/audioplayer.h
+    audio/audioplayer.ui
+    audio/bd.cpp
+    audio/bd.h
+
+    data/stageinfo.cpp
+    data/stageinfo.h
     data/ptr2struct.cpp
     data/ptr2struct.h
 
@@ -49,16 +51,13 @@ set(PROJECT_SOURCES
     io/ptr2reader.cpp
     io/ptr2reader.h
 
-    types.h
-    intcommand.h intcommand.cpp
+    lib/miniaudio.h
+    lib/pine/src/pine.h
+
     resources.qrc
 )
 
-# Add executable for Qt6
-qt_add_executable(${PROJECT_NAME}
-    ${PROJECT_SOURCES}
-    settings.h settings.cpp settings.ui
-)
+add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
 
 # Link necessary libraries
 target_link_libraries(${PROJECT_NAME} PRIVATE
