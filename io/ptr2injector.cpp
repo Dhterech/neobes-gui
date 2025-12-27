@@ -11,9 +11,7 @@
 #define UPLOAD_SIZE(y, x, s) pcsx2reader::write(y, &(x), s)
 #define DOWNLOAD_SIZE(y, x, s) pcsx2reader::read(y, &(x), s)
 
-uint32_t getLineOops(PLAYER_CODE owner, currentstage_t StageInfo, bool VSMode) {
-    uint32_t oopsposition = StageInfo.buttondatabase;
-
+uint32_t getLineOops(PLAYER_CODE owner, uint32_t oopsposition, bool VSMode) {
     if(VSMode) {
         switch(owner) {
         case PLAYER_CODE::PCODE_BOXY:
@@ -50,10 +48,37 @@ void updateRecordScCommands(int type, int endtype, uint32_t oldPointer, uint32_t
     }
 }
 
+template<size_t N>
+void uploadEditorLine(uint32_t &linebase, uint32_t &buttonbase, uint32_t &oopsbase, bool VSMode, bool SUBMode, e_suggestline_t& line) {
+    suggestline_base<N> ps2line;
+
+    ps2line.buttoncount = line.buttons.size();
+    ps2line.ptr_buttons = buttonbase;
+    for(int b = 0; b < line.buttons.size(); b++) { UPLOAD(buttonbase, line.buttons[b]); }
+
+    ps2line.type = line.type;
+    ps2line.coolmodethreshold = line.coolmodethreshold;
+
+    ps2line.chan[0] = line.chan[0];
+    ps2line.chan[1] = line.chan[1];
+
+    for(int s = 0; s < N; s++) {
+        ps2line.ptr_subtitles[s] = (SUBMode) ? line.ptr_subtitles[s] : uint32_t(~0);
+    }
+
+    ps2line.owner = line.owner;
+    ps2line.timestamp_start = line.timestamp_start;
+    ps2line.timestamp_end = line.timestamp_end;
+    ps2line.ptr_oops = getLineOops(line.owner, oopsbase, VSMode);
+    ps2line.oopscount = 6;
+
+    UPLOAD(linebase, ps2line);
+}
+
 // FIXME: When getting from neodata.h directly, anything after the change breaks.
 bool pcsx2upload(std::vector<e_suggestrecord_t> Records, std::vector<scenemode_t> Modes, std::vector<std::vector<commandbuffer_t>> ModeCommands, currentstage_t StageInfo, bool VSMode, bool PALMode, bool SUBMode, int OopsSize, uint32_t ModeSize) {
     uint32_t uploadPos = StageInfo.buttondatabase;
-    uploadPos += OopsSize; // skip oops buttons
+    uploadPos += OopsSize; // do not overwrite oops buttons
 
     for(int i = 0; i < Records.size(); i++) {
         e_suggestrecord_t &record = Records[i];
@@ -74,41 +99,15 @@ bool pcsx2upload(std::vector<e_suggestrecord_t> Records, std::vector<scenemode_t
             ps2variant.ptr_lines = linebase;
 
             for(e_suggestline_t &line : variant.lines) {
-                suggestline_t ps2line;
-                suggestline_t_pal ps2lineP;
-
-                if(!PALMode) {
-                    ps2line.buttoncount = line.buttons.size();
-                    ps2line.ptr_buttons = buttonbase;
-                    for(int n = 0; n < line.buttons.size(); n++) { UPLOAD(buttonbase, line.buttons[n]);}
-                    ps2line.type = line.type;
-                    ps2line.coolmodethreshold = line.coolmodethreshold;
-                    for(int c = 0; c < 2; c++) {ps2line.chan[c] = line.chan[c];}
-                    for(int s = 0; s < 2; s++) {ps2line.ptr_subtitles[s] = (SUBMode) ? line.ptr_subtitles[s] : uint32_t(~0);}
-                    ps2line.owner = line.owner;
-                    ps2line.timestamp_start = line.timestamp_start;
-                    ps2line.timestamp_end = line.timestamp_end;
-                    ps2line.ptr_oops = getLineOops(line.owner, StageInfo, VSMode);//line.ptr_oops;
-                    ps2line.oopscount = 6;//line.oopscount;
-                    UPLOAD(linebase, ps2line);
-                } else {
-                    ps2lineP.buttoncount = line.buttons.size();
-                    ps2lineP.ptr_buttons = buttonbase;
-                    for(int n = 0; n < line.buttons.size(); n++) { UPLOAD(buttonbase, line.buttons[n]); }
-                    ps2lineP.type = line.type;
-                    ps2lineP.coolmodethreshold = line.coolmodethreshold;
-                    for(int c = 0; c < 2; c++) {ps2lineP.chan[c] = line.chan[c];}
-                    for(int s = 0; s < 5; s++) {ps2lineP.ptr_subtitles[s] = (SUBMode) ? line.ptr_subtitles[s] : uint32_t(~0);}
-                    ps2lineP.owner = line.owner;
-                    ps2lineP.timestamp_start = line.timestamp_start;
-                    ps2lineP.timestamp_end = line.timestamp_end;
-                    ps2lineP.ptr_oops = getLineOops(line.owner, StageInfo, VSMode);//line.ptr_oops;
-                    ps2lineP.oopscount = 6;//line.oopscount;
-                    UPLOAD(linebase, ps2lineP);
-                }
+                if (!PALMode)
+                    uploadEditorLine<2>(linebase, buttonbase, StageInfo.buttondatabase, VSMode, SUBMode, line);
+                else
+                    uploadEditorLine<5>(linebase, buttonbase, StageInfo.buttondatabase, VSMode, SUBMode, line);
             }
+
             uploadPos = linebase; /* linebase is actually after all lines */
         }
+
         for(int v = 0; v < 17; v++) {
             e_suggestvariant_t &variant = record.variants[v];
             suggestvariant_t &ps2variant = ps2record.variants[v];
@@ -118,6 +117,7 @@ bool pcsx2upload(std::vector<e_suggestrecord_t> Records, std::vector<scenemode_t
             ps2variant.numlines = linkedto.numlines;
             ps2variant.ptr_lines = linkedto.ptr_lines;
         }
+
         ps2record.lengthinsubdots = record.lengthinsubdots;
         ps2record.soundboardid = record.soundboardid;
         memcpy(ps2record.vs_data, record.vs_data, sizeof(ps2record.vs_data));
@@ -127,6 +127,7 @@ bool pcsx2upload(std::vector<e_suggestrecord_t> Records, std::vector<scenemode_t
         } else { // Other scenes
             updateRecordScCommands(record.type, record.type, record.address, uploadPos, ModeCommands);
         }
+
         UPLOAD(uploadPos, ps2record);
     }
  

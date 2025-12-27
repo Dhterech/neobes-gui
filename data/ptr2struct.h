@@ -38,7 +38,8 @@ struct suggestbutton_t {                     // Original Struct Name: TAPDAT
     soundentry_t sounds[4];                  // tapct
 };
 
-struct suggestline_t {                       // Original Struct Name: TAPSET
+template<size_t subcount>
+struct suggestline_base {                    // Original Struct Name: TAPSET
     PLAYER_CODE owner;                       // player_code
     int32_t buttoncount;                     // tapdat_size
     uint32_t ptr_buttons;                    // tapdat_pp
@@ -52,29 +53,13 @@ struct suggestline_t {                       // Original Struct Name: TAPSET
     int32_t coolmodethreshold;               // coolup
 
     uint32_t chan[2];                        // chan[2]
-    uint32_t ptr_subtitles[2];               // tapsubt[2]
+    uint32_t ptr_subtitles[subcount];        // tapsubt[2 NTSC / 5 PAL]
 
     TAPSCODE_ENUM type;                      // tapscode
 };
 
-struct suggestline_t_pal {                   // Original Struct Name: TAPSET
-    PLAYER_CODE owner;                       // player_code
-    int32_t buttoncount;                     // tapdat_size
-    uint32_t ptr_buttons;                    // tapdat_pp
-
-    int32_t oopscount;                       // tapdatNG_size
-    uint32_t ptr_oops;                       // tapdatNG_pp
-
-    int32_t timestamp_start;                 // taptimeStart
-    int32_t timestamp_end;                   // taptimeEnd
-
-    int32_t coolmodethreshold;               // coolup
-
-    uint32_t chan[2];                        // chan[2]
-    uint32_t ptr_subtitles[5];               // tapsubt[2]
-
-    TAPSCODE_ENUM type;                      // tapscode
-};
+using suggestline_t = suggestline_base<2>;
+using suggestline_t_pal = suggestline_base<5>;
 
 struct e_suggestline_t {
     PLAYER_CODE owner;
