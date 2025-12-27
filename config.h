@@ -1,5 +1,5 @@
-#ifndef BES_CONFIG_H
-#define BES_CONFIG_H
+#ifndef CONFIG_H
+#define CONFIG_H
 
 #include "types.h"
 
@@ -103,4 +103,4 @@ private:
     QSettings *m_settings;
 };
 
-#endif // BES_CONFIG_H
+#endif // CONFIG_H

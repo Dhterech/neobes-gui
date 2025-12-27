@@ -8,7 +8,7 @@
 #include <QVector>
 #include <algorithm>
 
-#include "audio/soundsystem.h"
+#include "audio/soundmanager.h"
 #include "neodata.h"
 
 // AudioPlayer class definition

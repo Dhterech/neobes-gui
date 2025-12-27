@@ -1,5 +1,5 @@
-#ifndef BES_SUGGEST_H
-#define BES_SUGGEST_H
+#ifndef PTR2STRUCT_H
+#define PTR2STRUCT_H
 
 #include "types.h"
 
@@ -149,5 +149,5 @@ struct scenemode_t {                 // Original Struct Name: SCR_CTRL
     float bpm;                       // tempo
 };
 
-#endif // BES_SUGGEST_H
+#endif // PTR2STRUCT_H
 

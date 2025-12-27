@@ -1,5 +1,5 @@
-#ifndef INTCOMMAND_H
-#define INTCOMMAND_H
+#ifndef JOB_H
+#define JOB_H
 
 #include "data/ptr2struct.h"
 #include "types.h"
@@ -26,4 +26,4 @@ public:
     static int ConvertToNormal(QString guiText, commandbuffer_t job, int row, int col);
 };
 
-#endif // INTCOMMAND_H
+#endif // JOB_H

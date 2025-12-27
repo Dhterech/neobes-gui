@@ -1,4 +1,4 @@
-#include "ptr2stages.h"
+#include "stageinfo.h"
 
 // 0 USA, 1 PAL, 2 JP-DEBUG
 
