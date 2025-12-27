@@ -1,4 +1,4 @@
-#include "intcommand.h"
+#include "job.h"
 
 QString modesSingleP[] = {"Cool", "Good", "Bad", "Awful", "Cooler", "Less cool", "Better", "Worse"};
 

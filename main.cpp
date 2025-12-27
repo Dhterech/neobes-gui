@@ -1,4 +1,4 @@
-#include "neobes.h"
+#include "ui/neobes.h"
 
 #include <QApplication>
 

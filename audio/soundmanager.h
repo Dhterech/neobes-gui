@@ -1,5 +1,5 @@
-#ifndef SOUNDSYSTEM_H
-#define SOUNDSYSTEM_H
+#ifndef SOUNDMANAGER_H
+#define SOUNDMANAGER_H
 
 #include <vector>
 #include <array>
@@ -100,4 +100,4 @@ void cleanupTicker();
 void initSound();
 void cleanupSound();
 
-#endif // SOUNDSYSTEM_H
+#endif // SOUNDMANAGER_H

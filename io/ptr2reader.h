@@ -1,8 +1,8 @@
-#ifndef BES_PCSX2UTIL_H
-#define BES_PCSX2UTIL_H
+#ifndef PTR2READER_H
+#define PTR2READER_H
 
 #include "data/ptr2struct.h"
-#include "data/ptr2stages.h"
+#include "data/stageinfo.h"
 
 #define HD_SIGNATURE 0x53434549
 
@@ -28,4 +28,4 @@ bool olmupload(QString filename);
 void getProjectRecordAddresses();
 
 //char pcsx2GetOLM(int size);
-#endif // BES_PCSX2UTIL_H
+#endif // PTR2READER_H

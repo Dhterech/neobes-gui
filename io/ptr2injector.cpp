@@ -1,5 +1,5 @@
 #include "data/ptr2struct.h"
-#include "data/ptr2stages.h"
+#include "data/stageinfo.h"
 #include "emuinterfacer.h"
 //#include "neodata.h"
 #include <fstream>

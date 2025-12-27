@@ -556,7 +556,7 @@ void neobes::drawEditorGUI() {
     isMenu = false;
 }
 
-#include "intcommand.h"
+#include "job.h"
 
 bool once = false;
 void neobes::setupCommandCB() {

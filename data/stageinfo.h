@@ -1,5 +1,5 @@
-#ifndef BES_STAGEINFO_H
-#define BES_STAGEINFO_H
+#ifndef STAGEINFO_H
+#define STAGEINFO_H
 
 #include "types.h"
 
@@ -27,4 +27,4 @@ struct stageinfo_t {
 
 extern stageinfo_t stages[18];
 
-#endif // BES_STAGEINFO_H
+#endif // STAGEINFO_H
