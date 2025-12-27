@@ -229,14 +229,14 @@ int neodata::SaveToEmu() {
     if(CurrentRegion == 2 && SettingsManager::instance().bhvDebugJP()) CurrentRegion = 3;
     if(CurrentRegion == -1) return 5;
 
+    uint32_t loadedStage = 0xFFFF;
+    pcsx2reader::read(CURRENT_STAGE[CurrentRegion], &loadedStage, 4);
+    if(loadedStage != CurrentStage + 1) return 3;
+
     if(Modes.size() == 0 || modestage != StageInfo.name) { // If we don't have modes for this
         pcxs2GetModelist(StageInfo.stagemodelistbase, ModeSize); // Project File doesn't have modes
         modestage = StageInfo.name;
     }
-
-    uint32_t loadedStage = 0xFFFF;
-    pcsx2reader::read(CURRENT_STAGE[CurrentRegion], &loadedStage, 4);
-    if(loadedStage != CurrentStage + 1) return 3;
 
     try {
         bool result = pcsx2upload(Records, Modes, ModeCommands, StageInfo, VSMode, PALMode, SUBMode, OopsSize, ModeSize);
