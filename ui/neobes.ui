@@ -103,7 +103,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
               <string/>
              </property>
              <property name="pixmap">
-              <pixmap resource="resources.qrc">:/menu/res/menu/logo.jpg</pixmap>
+              <pixmap resource="../resources.qrc">:/menu/res/menu/logo.jpg</pixmap>
              </property>
              <property name="scaledContents">
               <bool>true</bool>
@@ -149,7 +149,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                  <string>Load Project</string>
                 </property>
                 <property name="icon">
-                 <iconset resource="resources.qrc">
+                 <iconset resource="../resources.qrc">
                   <normaloff>:/menu/res/menu/besproj.png</normaloff>:/menu/res/menu/besproj.png</iconset>
                 </property>
                 <property name="iconSize">
@@ -175,7 +175,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                  <string>Load from Emu</string>
                 </property>
                 <property name="icon">
-                 <iconset resource="resources.qrc">
+                 <iconset resource="../resources.qrc">
                   <normaloff>:/menu/res/menu/emudown.png</normaloff>:/menu/res/menu/emudown.png</iconset>
                 </property>
                 <property name="iconSize">
@@ -201,7 +201,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                  <string>Settings</string>
                 </property>
                 <property name="icon">
-                 <iconset resource="resources.qrc">
+                 <iconset resource="../resources.qrc">
                   <normaloff>:/menu/res/menu/config.png</normaloff>:/menu/res/menu/config.png</iconset>
                 </property>
                 <property name="iconSize">
@@ -227,7 +227,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                  <string>About</string>
                 </property>
                 <property name="icon">
-                 <iconset resource="resources.qrc">
+                 <iconset resource="../resources.qrc">
                   <normaloff>:/menu/res/menu/what.png</normaloff>:/menu/res/menu/what.png</iconset>
                 </property>
                 <property name="iconSize">
@@ -595,7 +595,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                  </column>
                  <column>
                   <property name="text">
-                   <string>Subtitle</string>
+                   <string>Line</string>
                   </property>
                  </column>
                 </widget>
@@ -909,7 +909,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
   </action>
  </widget>
  <resources>
-  <include location="resources.qrc"/>
+  <include location="../resources.qrc"/>
  </resources>
  <connections>
   <connection>

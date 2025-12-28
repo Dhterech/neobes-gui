@@ -416,16 +416,14 @@ void neobes::afterProjLoad() {
     CurrentVariant = 0;
 }
 
-QString drawRecord(PLAYER_CODE owner, int start, int length, int interval, int cursorPos) {
-    QString drawnRec;
-    suggestbutton_t button;
-
-    QString cursor = "<b style=\"background-color: " + accentColor + "\">%1</b>";
-    QString iconStart = "<img src=\"%1\" width=" + QString::number(SettingsManager::instance().hudIconSize()) + ">";
-    bool escapeEditorLines = SettingsManager::instance().hudEscapeLines();
-
+QString drawLine(int start, int end, int interval, PLAYER_CODE owner, int skip, int cursorPos, bool escapeEditorLines) {
     e_suggestvariant_t &variant = Records[CurrentRecord].variants[MentionedVariant];
-    for (int dot = start; dot < start + length; dot += interval) {
+    QString iconStart = "<img src=\"%1\" width=" + QString::number(SettingsManager::instance().hudIconSize()) + ">";
+    QString cursor = "<b style=\"background-color: " + accentColor + "\">%1</b>";
+    suggestbutton_t button;
+    QString out;
+
+    for (int dot = start; dot < end; dot += interval) {
         QString drawnIcon = "";
 
         for(int subcount = 0; subcount < interval; subcount++) {
@@ -441,11 +439,20 @@ QString drawRecord(PLAYER_CODE owner, int start, int length, int interval, int c
             drawnIcon = iconStart.arg(buttonsUIResNot[isStar+isOwned]);
         }
 
-        if(dot / interval % 32 == 0 && interval != 0 && interval != 1 && escapeEditorLines) drawnRec += "<br>";
+        if(dot / interval % 32 == 0 && interval != 0 && interval != 1 && escapeEditorLines) out += "<br>";
 
         if(dot / interval == cursorPos) drawnIcon = cursor.arg(drawnIcon); // Add cursor
-        drawnRec += drawnIcon;
+        out += drawnIcon;
     }
+
+    return out;
+}
+
+QString drawRecord(PLAYER_CODE owner, int start, int length, int interval, int cursorPos) {
+    bool escapeEditorLines = SettingsManager::instance().hudEscapeLines();
+    QString drawnRec;
+
+    drawnRec = drawLine(start, start + length, interval, owner, interval, cursorPos, escapeEditorLines);
 
     isMenu = true;
     return drawnRec;
@@ -501,11 +508,19 @@ void neobes::drawLineProperties() {
     for(const e_suggestline_t &line : Records[CurrentRecord].variants[MentionedVariant].lines) {
         QTableWidgetItem *coolTres = new QTableWidgetItem(QString::number((int32_t)line.coolmodethreshold));
         QTableWidgetItem *ownerNam = new QTableWidgetItem(getOwnerName(line.owner));
-        QTableWidgetItem *subtitle = new QTableWidgetItem("Placeholder");
+
+        suggestbutton_t button;
+        QString drawn = drawLine(line.timestamp_start, line.timestamp_end, 24, line.owner, 24, -1, false);
+        QLabel *lineLabel = new QLabel(drawn);
+
         ui->lineOptions->setItem(count,0,coolTres);
         ui->lineOptions->setItem(count,1,ownerNam);
-        ui->lineOptions->setItem(count,2,subtitle);
+        ui->lineOptions->setCellWidget(count,2,lineLabel);
         count++;
+
+        if(owners[cursorowner] == line.owner && (cursorpos * 24 >= line.timestamp_start && cursorpos * 24 <= line.timestamp_end)) {
+            ui->lineOptions->selectRow(count-1);
+        }
     }
 }
 
