@@ -1,14 +1,34 @@
 #include "job.h"
+#include <QStringList>
 
-QString modesSingleP[] = {"Cool", "Good", "Bad", "Awful", "Cooler", "Less cool", "Better", "Worse"};
+QString modesSingleP[] = {
+    "Cool", "Good", "Bad", "Awful",
+    "Cooler", "Less cool", "Better", "Worse"
+};
 
-QString examMode[] = {"EXAM_NONE", "EXAM_COOL", "EXAM_GOOD", "EXAM_BAD", "EXAM_AWFUL", "EXAM_HOOK", "EXAM_VS", "EXAM_CANCEL", "EXAM_BONUS", "EXAM_MAX"};
-QString examModeDo[] = { "EXAM_DO_NON", "EXAM_DO_END", "EXAM_DO_END_GO", "EXAM_DO_END_GO_RET"};
+QString examMode[] = {
+    "EXAM_NONE", "EXAM_COOL", "EXAM_GOOD", "EXAM_BAD", "EXAM_AWFUL",
+    "EXAM_HOOK", "EXAM_VS", "EXAM_CANCEL", "EXAM_BONUS", "EXAM_MAX"
+};
 
-QString job_setup_owners[] = {"Unknown", "None", "Teacher", "PaRappa", "BoxxyBoi", "Special"};
-QString job_setup_icon[] = {"Nothing", "PaRappa", "Boxxy", "Beard B.", "Master Onion", "Ant", "Sister Moosesha", "Takoyama", "Takoyama", "Colonel Noodle", "Mushi", "White fog", "Orange line", "Blue line"};
+QString examModeDo[] = {
+    "EXAM_DO_NON", "EXAM_DO_END", "EXAM_DO_END_GO", "EXAM_DO_END_GO_RET"
+};
 
-QString subjob_displaylr[] = {"Lesson 1", "Lesson 2", "Lesson 3", "Lesson 4", "Lesson 5", "Round 1", "Round 2", "Round 3", "Round 4", "Round 5"};
+QString job_setup_owners[] = {
+    "Unknown", "None", "Teacher", "PaRappa", "BoxxyBoi", "Special"
+};
+
+QString job_setup_icon[] = {
+    "Nothing", "PaRappa", "Boxxy", "Beard B.", "Master Onion", "Ant",
+    "Sister Moosesha", "Takoyama", "Takoyama", "Colonel Noodle", "Mushi",
+    "White fog", "Orange line", "Blue line"
+};
+
+QString subjob_displaylr[] = {
+    "Lesson 1", "Lesson 2", "Lesson 3", "Lesson 4", "Lesson 5",
+    "Round 1", "Round 2", "Round 3", "Round 4", "Round 5"
+};
 
 QString jobCommands[] = {
     "SCRRJ_PLY",               // 0x0
@@ -56,169 +76,294 @@ QString subjobCommands[] = {
     "SCRSUBJ_MAX"              // 0x18
 };
 
+static int findStringIndex(const QString& target, const QString array[], int size) {
+    for (int i = 0; i < size; ++i) {
+        if (target == array[i]) return i;
+    }
+    return -1; // Not found
+}
+
 void intcommand::handleSceneCommand(GUICommand &gui, int rank, int time) {
-    gui.arg1 = "RANK: " + modesSingleP[rank];
-    gui.arg4 = "TIME: " + QString::number(time);
+    if (rank >= 0 && rank < std::size(modesSingleP)) {
+        gui.arg1 = "Rank: " + modesSingleP[rank];
+    } else {
+        gui.arg1 = "Rank: " + QString::number(rank);
+    }
+    gui.arg4 = "Time: " + QString::number(time);
 }
 
 void intcommand::reverseHandleSceneCommand(GUICommand &gui, uint16_t &rank, uint32_t &time) {
-    QString rankPrefix = "RANK: ";
-    QString timePrefix = "TIME: ";
+    const QString rankPrefix = "Rank: ";
+    const QString timePrefix = "Time: ";
 
     if (gui.arg1.startsWith(rankPrefix)) {
         QString rankTmp = gui.arg1.mid(rankPrefix.length());
-        for (int i = 0; i < sizeof(modesSingleP) / sizeof(modesSingleP[0]); ++i) {
-            if (rankTmp == modesSingleP[i]) {
-                rank = i;
-                break;
-            }
+        int index = findStringIndex(rankTmp, modesSingleP, std::size(modesSingleP));
+
+        if (index != -1) {
+            rank = index;
+        } else {
+            rank = rankTmp.toInt();
         }
+    } else {
+        rank = gui.arg1.toInt();
     }
 
-    time = gui.arg4.sliced(timePrefix.length()).toInt();
+    if (gui.arg4.startsWith(timePrefix)) {
+        time = gui.arg4.mid(timePrefix.length()).toInt();
+    } else {
+        time = gui.arg4.toInt();
+    }
 }
 
 QString intcommand::handleRecord(int pointer) {
-    QString string;
     int count = 0;
-    for(e_suggestrecord_t &record : Records) {
-        if(pointer == record.address) {
-            string.append(QString::number(count));
-            return string;
+    for (e_suggestrecord_t &record : Records) {
+        if (pointer == record.address) {
+            return QString::number(count);
         }
         count++;
     }
-    string.append("Not Loaded");
-    return string;
+    return "Not Loaded";
 }
 
 uint32_t intcommand::reverseHandleRecord(QString argument) {
+    if (argument.contains(": ")) {
+        argument = argument.split(": ").last();
+    }
+
     int recordNum = argument.toInt();
 
-    if (recordNum >= 0 && recordNum < Records.size()) return Records[recordNum].address;
+    if (recordNum >= 0 && recordNum < Records.size()) {
+        return Records[recordNum].address;
+    }
     return 0xFFFFFFF;
 }
 
 QString intcommand::handleOwners(uint32_t owner) {
-    QString string;
-    if(owner == 0) string += job_setup_owners[0];
-    else if(owner & 0x01) string += job_setup_owners[1] + " ";
-    else if(owner & 0x02) string += job_setup_owners[2] + " ";
-    else if(owner & 0x04) string += job_setup_owners[3] + " ";
-    else if(owner & 0x08) string += job_setup_owners[4] + " ";
-    else if(owner & 0x10) string += job_setup_owners[5] + " ";
-    return string;
+    if (owner == 0) return job_setup_owners[0];
+
+    QStringList owners;
+    if (owner & 0x01) owners << job_setup_owners[1];
+    if (owner & 0x02) owners << job_setup_owners[2];
+    if (owner & 0x04) owners << job_setup_owners[3];
+    if (owner & 0x08) owners << job_setup_owners[4];
+    if (owner & 0x10) owners << job_setup_owners[5];
+
+    return owners.join(" ");
 }
 
 GUICommand intcommand::ConvertToGUI(commandbuffer_t command) {
     GUICommand gui;
-    if(command.arg1 >= 0 || command.arg1 <= 17) {
+
+    if (command.cmd_id >= 0 && command.cmd_id < std::size(jobCommands)) {
         gui.commandType = jobCommands[command.cmd_id];
     } else {
         gui.commandType = "UNKNOWN JOB";
     }
 
-    switch(command.cmd_id) {
-        case 00: // "SETUP";
+    switch (command.cmd_id) {
+        case 0x00: // SCRRJ_PLY (SETUP)
             gui.arg1 = "Owner: " + handleOwners(command.arg1);
-
-            gui.arg2 = "Icon: " + job_setup_icon[command.arg2];
+            if (command.arg2 >= 0 && command.arg2 < std::size(job_setup_icon)) {
+                gui.arg2 = "Icon: " + job_setup_icon[command.arg2];
+            } else {
+                gui.arg2 = "Icon: " + QString::number(command.arg2);
+            }
             gui.arg4 = "Time: " + QString::number(command.arg4);
             break;
-        case 1: // "LOAD_PLAY_RECORD";
+
+        case 0x01: // SCRRJ_SCR (LOAD_PLAY_RECORD)
+        {
+            QString follows[] = {"None", "Save", "Load"};
+            if (command.arg1 >= 0 && command.arg1 < 3) {
+                gui.arg1 = "Follow: " + follows[command.arg1];
+            } else {
+                gui.arg1 = "Follow: " + QString::number(command.arg1);
+            }
             gui.arg4 = "Record: " + handleRecord(command.arg4);
             break;
-        case 2: // "SCORE"
-            if (command.arg1 >= 0 && command.arg1 < sizeof(examMode)/sizeof(examMode[0])) {
+        }
+
+        case 0x02: // SCRRJ_EXAM (SCORE)
+            if (command.arg1 >= 0 && command.arg1 < std::size(examMode)) {
                 gui.arg1 = "Mode: " + examMode[command.arg1];
             } else {
                 gui.arg1 = "Mode: " + QString::number(command.arg1);
             }
 
-            if(VSMode) {
+            if (VSMode) {
                 gui.arg4 = "Player: " + handleOwners(command.arg4);
+            } else {
+                gui.arg4 = "PlayerCode: " + QString::number(command.arg4);
             }
             break;
-        case 3: // "SCENE_BETTER";
-        case 4: // "SCENE_COOLER";
-        case 5: // "SCENE_OOPS";
-        case 6: // "SCENE_WORSE";
-            gui.arg1 = "Rank: " + modesSingleP[command.arg1];
-            gui.arg4 = "Time: " + QString::number(command.arg4);
+
+        case 0x03: // SCRRJ_UP_LINE
+        case 0x04: // SCRRJ_UP_JOB
+        case 0x05: // SCRRJ_DOWN_LINE
+        case 0x06: // SCRRJ_DOWN_JOB
+            handleSceneCommand(gui, command.arg1, command.arg4);
             break;
-        case 7:
-        case 8: // "RETURN"; "END_STAGE";
-            // Doesn't seem to read anything directly afaik
-            //gui.arg1 = "Unknown";
-            //gui.arg4 = "Unknown";
+
+        case 0x07: // SCRRJ_ENDJOB
+        case 0x08: // SCRRJ_ENDGAME
             break;
-        case 9: // "RUN_SUBJOB";
-            if(command.arg1 >= 0 || command.arg1 <= 24) {
+
+        case 0x09: // SCRRJ_SUBJOB (RUN_SUBJOB)
+            if (command.arg1 >= 0 && command.arg1 < std::size(subjobCommands)) {
                 gui.arg1 = subjobCommands[command.arg1];
             } else {
                 gui.arg1 = "UNKNOWN SUBJOB";
             }
-            //gui.arg4 = QString::number(command.arg4);
 
-            if(command.arg1 >= 6 && command.arg1 <= 9) { // "SCRSUBJ_SPU_ON"
-                gui.arg2 = "SoundBoard: " + QString::number(command.arg2);
-                gui.arg3 = "Number: " + QString::number(command.arg3);
-            }
-
-            if(command.arg1 == 10) { // "SCRSUBJ_TITLE"
-                gui.arg2 = "Dera: " + QString::number(command.arg2);
-                gui.arg3 = "Menderer: " + QString::number(command.arg1);
-            }
-
-            if(command.arg1 == 0xE) {
-                gui.arg2 = "Record: " + handleRecord(command.arg2);
-            }
-
-            if(command.arg1 == 0x12) { // "SCRSUBJ_LESSON"
-                gui.arg2 = subjob_displaylr[command.arg2];
-                gui.arg3 = "Time: " + QString::number(command.arg3);
-            }
-
-            if(command.arg1 == 0x16) { // "SCRSUBJ_SPU_OFF"
-                gui.arg2 = "SoundBoard: " + QString::number(command.arg2);
+            // Sub-job specific handling
+            switch (command.arg1) {
+                case 0x04: // SCRSUBJ_EFFECT
+                    gui.arg2 = "Mode: " + QString::number(command.arg2);
+                    gui.arg3 = "Depth: " + QString::number(command.arg3);
+                    break;
+                case 0x05: // SCRSUBJ_REVERS
+                    gui.arg2 = "Duration: " + QString::number(command.arg2);
+                    break;
+                case 0x06: // SCRSUBJ_SPU_ON
+                case 0x07: // SCRSUBJ_SPU_ON2
+                case 0x08: // SCRSUBJ_SPU_ON3
+                case 0x09: // SCRSUBJ_SPU_ON4
+                    gui.arg2 = "SoundBoard: " + QString::number(command.arg2);
+                    gui.arg3 = "Number: " + QString::number(command.arg3);
+                    break;
+                case 0x0A: // SCRSUBJ_TITLE
+                    gui.arg2 = "Dera: " + QString::number(command.arg2);
+                    gui.arg3 = "Menderer: " + QString::number(command.arg3);
+                    break;
+                case 0x0B: // SCRSUBJ_LOOP
+                    gui.arg2 = "Target Time: " + QString::number(command.arg2);
+                    break;
+                case 0x0E: // SCRSUBJ_SPUTRANS
+                    gui.arg2 = "Record: " + handleRecord(command.arg2);
+                    break;
+                case 0x12: // SCRSUBJ_LESSON
+                    if (command.arg2 >= 0 && command.arg2 < std::size(subjob_displaylr)) {
+                        gui.arg2 = subjob_displaylr[command.arg2];
+                    }
+                    gui.arg3 = "Time: " + QString::number(command.arg3);
+                    break;
+                case 0x14: // SCRSUBJ_CDSND_READY
+                    gui.arg2 = "File Index: " + QString::number(command.arg2);
+                    break;
+                case 0x15: // SCRSUBJ_CDSND_REQ
+                    gui.arg2 = "Volume: " + QString::number(command.arg2);
+                    break;
+                case 0x16: // SCRSUBJ_SPU_OFF
+                    gui.arg2 = "SoundBoard: " + QString::number(command.arg2);
+                    break;
             }
             break;
-        case 0xA:
-        case 0xB:
-        case 0xC:
-        case 0xD:
-        case 0xE:
-            break;
+
+                case 0x0A: // SCRRJ_MSG_DISP
+                    break;
+
+                case 0x0B: // SCRRJ_ADD_JOB
+                case 0x0C: // SCRRJ_SUB_JOB
+                    if (command.arg1 >= 0 && command.arg1 < std::size(modesSingleP)) {
+                        gui.arg1 = "SrcRank: " + modesSingleP[command.arg1];
+                    } else {
+                        gui.arg1 = "SrcLine: " + QString::number(command.arg1);
+                    }
+                    gui.arg2 = "TgtLine: " + QString::number(command.arg2);
+                    gui.arg4 = "Time: " + QString::number(command.arg4);
+                    break;
+
+                case 0x0D: // SCRRJ_LINE
+                case 0x0E: // SCRRJ_JOB
+                    if (command.arg1 >= 0 && command.arg1 < std::size(modesSingleP)) {
+                        gui.arg1 = "TgtRank: " + modesSingleP[command.arg1];
+                    } else {
+                        gui.arg1 = "TgtLine: " + QString::number(command.arg1);
+                    }
+                    gui.arg3 = "ExamJob: " + QString::number(command.arg3);
+                    gui.arg4 = "Time: " + QString::number(command.arg4);
+                    break;
     }
+
     return gui;
 }
 
 int intcommand::ConvertToNormal(QString guiText, commandbuffer_t job, int row, int col) {
     int numberInput = 0;
     bool isNumber = false;
-    if(guiText.startsWith("0x")) {
-        numberInput = guiText.toInt(&isNumber, 16);
-    } else {
-        numberInput = guiText.toInt(&isNumber, 10);
+
+    QString textToConvert = guiText;
+    if (textToConvert.contains(": ")) {
+        textToConvert = textToConvert.split(": ").last();
     }
 
-    // Modifying job type, see if job name is typed then get the number
-    if(col == 0) {
-        if(!isNumber) {
-            int count = 0;
-            for(QString job : jobCommands) {
-                if(job == guiText) return count;
-                count++;
-            }
+    if (textToConvert.startsWith("0x")) {
+        numberInput = textToConvert.toInt(&isNumber, 16);
+    } else {
+        numberInput = textToConvert.toInt(&isNumber, 10);
+    }
+
+    if (col == 0) {
+        if (!isNumber) {
+            int idx = findStringIndex(guiText, jobCommands, std::size(jobCommands));
+            if (idx != -1) return idx;
         }
     }
 
-    if(col == 4 && job.cmd_id == 1) { // SCRRJ_SCR
+    if (!isNumber) {
+        switch (job.cmd_id) {
+            case 0x00: // SCRRJ_PLY (SETUP)
+                if (col == 2) {
+                    int idx = findStringIndex(textToConvert, job_setup_icon, std::size(job_setup_icon));
+                    if (idx != -1) return idx;
+                }
+                break;
+
+            case 0x01: // SCRRJ_SCR (LOAD_PLAY_RECORD)
+                if (col == 1) {
+                    if (textToConvert == "None") return 0;
+                    if (textToConvert == "Save") return 1;
+                    if (textToConvert == "Load") return 2;
+                }
+                break;
+
+            case 0x02: // SCRRJ_EXAM (SCORE)
+                if (col == 1) { // Exam Mode
+                    int idx = findStringIndex(textToConvert, examMode, std::size(examMode));
+                    if (idx != -1) return idx;
+                }
+                break;
+
+            case 0x09: // SCRRJ_SUBJOB
+                if (col == 1) {
+                    int idx = findStringIndex(guiText, subjobCommands, std::size(subjobCommands));
+                    if (idx != -1) return idx;
+                }
+                if (col == 2 && job.arg1 == 0x12) {
+                    int idx = findStringIndex(textToConvert, subjob_displaylr, std::size(subjob_displaylr));
+                    if (idx != -1) return idx;
+                }
+                break;
+        }
+
+        if (col == 1 && ((job.cmd_id >= 3 && job.cmd_id <= 6) ||
+            (job.cmd_id >= 0xB && job.cmd_id <= 0xE))) {
+            int idx = findStringIndex(textToConvert, modesSingleP, std::size(modesSingleP));
+        if (idx != -1) return idx;
+            }
+    }
+
+    // SCRRJ_SCR (Cmd 1 Col 4)
+    if (col == 4 && job.cmd_id == 0x01) {
         return reverseHandleRecord(guiText);
     }
 
-    if(job.cmd_id == 9) { // SCRRJ_SUB_JOB
-        if(col == 2 && job.arg1 == 0xE) { // SCRSUBJ_SPUTRANS
+    // SCRRJ_SUBJOB (Cmd 9)
+    if (job.cmd_id == 0x09) {
+        // SCRSUBJ_SPUTRANS (Subjob 0xE, Col 2)
+        if (col == 2 && job.arg1 == 0x0E) {
             return reverseHandleRecord(guiText);
         }
     }
