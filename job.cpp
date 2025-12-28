@@ -85,16 +85,16 @@ static int findStringIndex(const QString& target, const QString array[], int siz
 
 void intcommand::handleSceneCommand(GUICommand &gui, int rank, int time) {
     if (rank >= 0 && rank < std::size(modesSingleP)) {
-        gui.arg1 = "RANK: " + modesSingleP[rank];
+        gui.arg1 = "Rank: " + modesSingleP[rank];
     } else {
-        gui.arg1 = "RANK: " + QString::number(rank);
+        gui.arg1 = "Rank: " + QString::number(rank);
     }
-    gui.arg4 = "TIME: " + QString::number(time);
+    gui.arg4 = "Time: " + QString::number(time);
 }
 
 void intcommand::reverseHandleSceneCommand(GUICommand &gui, uint16_t &rank, uint32_t &time) {
-    const QString rankPrefix = "RANK: ";
-    const QString timePrefix = "TIME: ";
+    const QString rankPrefix = "Rank: ";
+    const QString timePrefix = "Time: ";
 
     if (gui.arg1.startsWith(rankPrefix)) {
         QString rankTmp = gui.arg1.mid(rankPrefix.length());
