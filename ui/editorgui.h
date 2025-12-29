@@ -1,9 +1,8 @@
-#ifndef NEOBES_H
-#define NEOBES_H
+#ifndef EDITORGUI_H
+#define EDITORGUI_H
 
 #include <QMainWindow>
-#include <QDragEnterEvent>
-#include <QMimeData>
+#include <QWidget>
 
 #include "audio/audioplayer.h"
 #include "io/emuinterfacer.h"
@@ -12,20 +11,43 @@
 #include "settings.h"
 #include "neodata.h"
 
+
 QT_BEGIN_NAMESPACE
-namespace Ui { class neobes; }
+namespace Ui { class editorgui; }
 QT_END_NAMESPACE
 
-class neobes : public QMainWindow
+class editorgui : public QWidget
 {
     Q_OBJECT
 
 public:
-    neobes(QWidget *parent = nullptr);
-    ~neobes();
+    explicit editorgui(QWidget *parent = nullptr);
+    ~editorgui();
+    void toggleActive();
+
+signals:
+    void editorReady(const QString &title);
+    void enableDestructive();
+    void disableDestructive();
+
+public slots:
+    void triggerFileLoadDrag();
+    // Main functions
+    int ASaveProject();
+    void ALoadProject();
+
+    void AUploadOLM();
+    void ADownloadOLM();
+
+    void AUploadEmu();
+    void ADownloadEmu();
+    // Other functions
+    void ALinkVariant(bool linkAll);
+    void ASetSoundboard();
+    void APlayVariant(bool ticker);
 
 private slots:
-    void changeMenu();
+    // Internal
     void handleDisplayClick();
     void handleButtonKeys(int buttonId);
     void handleWasdKeys(bool lr, int inc);
@@ -41,31 +63,14 @@ private slots:
     void ACommandCreate();
     void ACommandDelete();
 
-    // Main functions
-    int ASaveProject();
-    void ALoadProject();
-
-    void AUploadOLM();
-    void ADownloadOLM();
-
-    void AUploadEmu();
-    void ADownloadEmu();
-
-    void ASettingsGUI();
-    void AAboutGUI();
     void drawEditorGUI();
 
     void updateButtonProperties(int row, int column);
     void updateLineProperties(int row, int column);
     void updateCommandProperties();
 
-    // Other functions
-    void ALinkVariant(bool linkAll);
-    void ASetSoundboard();
-    void APlayVariant(bool ticker);
-
 private:
-    Ui::neobes *ui;
+    Ui::editorgui *ui;
     int displaySaveDlg();
     void importStageInfo();
     void afterProjLoad();
@@ -81,12 +86,9 @@ private:
 
 protected:
     void closeEvent(QCloseEvent *event) override;
-    void dragEnterEvent(QDragEnterEvent *event) override;
-    void dragMoveEvent(QDragMoveEvent *event) override;
-    void dragLeaveEvent(QDragLeaveEvent *event) override;
-    void dropEvent(QDropEvent *event) override;
 
     /* Editor Keyboard Input */
     void keyPressEvent(QKeyEvent *event) override;
 };
-#endif // NEOBES_H
+
+#endif // EDITORGUI_H

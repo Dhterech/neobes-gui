@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>menugui</class>
+ <widget class="QWidget" name="menugui">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1057</width>
+    <height>531</height>
+   </rect>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <item row="0" column="1">
+    <widget class="QFrame" name="frame_4">
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Shape::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Shadow::Raised</enum>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <item>
+       <widget class="QTextEdit" name="menuNews">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+        <property name="html">
+         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+hr { height: 1px; border-width: 0; }
+li.unchecked::marker { content: &quot;\2610&quot;; }
+li.checked::marker { content: &quot;\2612&quot;; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Noto Sans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;h1 style=&quot; margin-top:18px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:xx-large; font-weight:700;&quot;&gt;What's new&lt;/span&gt;&lt;/h1&gt;
+&lt;h2 style=&quot; margin-top:16px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:x-large; font-weight:700;&quot;&gt;Version 1.1 alpha&lt;/span&gt;&lt;/h2&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This version is the second version released for NeoBES. It includes some stability upgrades from the last version, fixes of bugs related to loading of games of other regions (JP/PAL) and bugs related to glitches in-game.&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;There is some minor additions here, such as settings for some customization on how you use the tool.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="textInteractionFlags">
+         <set>Qt::TextInteractionFlag::NoTextInteraction</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QGroupBox" name="mainMenuBox">
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <layout class="QVBoxLayout" name="Ma">
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="maximumSize">
+         <size>
+          <width>505</width>
+          <height>125</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="../resources.qrc">:/menu/res/menu/logo.jpg</pixmap>
+        </property>
+        <property name="scaledContents">
+         <bool>true</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+        </property>
+        <property name="wordWrap">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="mainBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>100</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="QToolButton" name="loadbesBtn">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Load Project</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources.qrc">
+             <normaloff>:/menu/res/menu/besproj.png</normaloff>:/menu/res/menu/besproj.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>64</width>
+             <height>64</height>
+            </size>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonStyle::ToolButtonTextUnderIcon</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="loademuBtn">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Load from Emu</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources.qrc">
+             <normaloff>:/menu/res/menu/emudown.png</normaloff>:/menu/res/menu/emudown.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>64</width>
+             <height>64</height>
+            </size>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonStyle::ToolButtonTextUnderIcon</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="settingsBtn">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Settings</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources.qrc">
+             <normaloff>:/menu/res/menu/config.png</normaloff>:/menu/res/menu/config.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>64</width>
+             <height>64</height>
+            </size>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonStyle::ToolButtonTextUnderIcon</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="infobackBtn">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>About</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources.qrc">
+             <normaloff>:/menu/res/menu/what.png</normaloff>:/menu/res/menu/what.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>64</width>
+             <height>64</height>
+            </size>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonStyle::ToolButtonTextUnderIcon</enum>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="recentFilesBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="title">
+         <string>Recent Files</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="../resources.qrc"/>
+ </resources>
+ <connections/>
+</ui>

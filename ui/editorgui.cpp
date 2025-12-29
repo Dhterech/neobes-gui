@@ -1,5 +1,6 @@
-#include "neobes.h"
-#include "ui_neobes.h"
+#include "editorgui.h"
+#include "ui/ui_editorgui.h"
+
 #include <QFileDialog>
 #include <QInputDialog>
 
@@ -7,7 +8,7 @@
 #include <QMessageBox>
 #include <QCloseEvent>
 
-bool isMenu = true;
+bool isEditorActive = false;
 
 int cursorpos = 0;
 int cursorowner = 0;
@@ -60,59 +61,33 @@ AudioPlayer *audio;
 
 QString accentColor;
 
-neobes::neobes(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::neobes)
+editorgui::editorgui(QWidget *parent)
+    : QWidget(parent)
+    , ui(new Ui::editorgui)
 {
     ui->setupUi(this);
     pcsx2reader::SetupIPC();
-    neodata::Log("NeoBES Launched");
 
-    updateLog();
-    drawMenuGUI();
     this->setFocusPolicy(Qt::StrongFocus);
-
     ui->variantInput->setMaximum(16);
-
-    connect(ui->actionChangeMenu, &QAction::triggered, this, &neobes::changeMenu);
-    connect(ui->actionSettings, &QAction::triggered, this, &neobes::ASettingsGUI);
-
-    connect(ui->actionLoad, &QAction::triggered, this, &neobes::ALoadProject);
-    connect(ui->actionSave, &QAction::triggered, this, &neobes::ASaveProject);
-
-    connect(ui->actionUploadOLM, &QAction::triggered, this, &neobes::AUploadOLM);
-    connect(ui->actionDownloadOLM, &QAction::triggered, this, &neobes::ADownloadOLM);
-
-    connect(ui->actionAbout, &QAction::triggered, this, &neobes::AAboutGUI);
-
-    connect(ui->actionDownloadEmu, &QAction::triggered, this, &neobes::ADownloadEmu);
-    connect(ui->actionUploadEmu, &QAction::triggered, this, &neobes::AUploadEmu);
-
-    /* Editing */
-    connect(ui->actionLink, &QAction::triggered, this, [=, this]() {neobes::ALinkVariant(false);});
-    connect(ui->actionLinkAll, &QAction::triggered, this, [=, this]() {neobes::ALinkVariant(true);});
-    connect(ui->actionPlayRecord, &QAction::triggered, this, [=, this](){neobes::APlayVariant(false);});
-    connect(ui->actionPlayRecordTicker, &QAction::triggered, this, [=, this](){neobes::APlayVariant(true);});
-
-    connect(ui->actionSetRecSB, &QAction::triggered, this, &neobes::ASetSoundboard);
 
     connect(ui->recordInput, QOverload<int>::of(&QSpinBox::valueChanged), this, [=, this]() {
         CurrentRecord = ui->recordInput->value();
-        neobes::drawEditorGUI();
+        editorgui::drawEditorGUI();
     });
     connect(ui->variantInput, QOverload<int>::of(&QSpinBox::valueChanged), this, [=, this]() {
         CurrentVariant = ui->variantInput->value();
-        neobes::drawEditorGUI();
+        editorgui::drawEditorGUI();
     });
 
-    connect(ui->butProperty, &QTableWidget::cellChanged, this, &neobes::updateButtonProperties);
-    connect(ui->lineOptions, &QTableWidget::cellChanged, this, &neobes::updateLineProperties);
+    connect(ui->butProperty, &QTableWidget::cellChanged, this, &editorgui::updateButtonProperties);
+    connect(ui->lineOptions, &QTableWidget::cellChanged, this, &editorgui::updateLineProperties);
     connect(ui->comSelector, &QComboBox::currentIndexChanged, this, [=, this]() {
-        neobes::drawCommands();
+        editorgui::drawCommands();
     });
-    connect(ui->comTable, &QTableWidget::cellChanged, this, &neobes::updateCommandProperties);
-    connect(ui->addCom, &QPushButton::clicked, this, &neobes::ACommandCreate);
-    connect(ui->remCom, &QPushButton::clicked, this, &neobes::ACommandDelete);
+    connect(ui->comTable, &QTableWidget::cellChanged, this, &editorgui::updateCommandProperties);
+    connect(ui->addCom, &QPushButton::clicked, this, &editorgui::ACommandCreate);
+    connect(ui->remCom, &QPushButton::clicked, this, &editorgui::ACommandDelete);
 
     /* Init audio */
     audio = new AudioPlayer();
@@ -122,10 +97,49 @@ neobes::neobes(QWidget *parent)
     accentColor = QApplication::palette().color(QPalette::Highlight).name();
 }
 
-/* Editor Keyboard Input */
-void neobes::keyPressEvent(QKeyEvent *event)
+editorgui::~editorgui()
 {
-    if(ui->stackedWidget->currentIndex() == 1) { // Only get keys when in editor
+    delete ui;
+}
+
+void editorgui::updateLog() {
+    ui->textLog->setPlainText(logHistory);
+}
+
+void editorgui::toggleActive() {
+    isEditorActive = !isEditorActive;
+}
+
+void editorgui::closeEvent(QCloseEvent *event) {
+    if(hasEdited) {
+        int wantsToGo = displaySaveDlg();
+        if(!wantsToGo) event->ignore();
+    }
+}
+
+int editorgui::displaySaveDlg() {
+    QMessageBox msgBox;
+    msgBox.setWindowTitle("Unsaved Changes");
+    msgBox.setIcon(QMessageBox::Warning);
+    msgBox.setText("The project file has been modified.");
+    msgBox.setInformativeText("Do you want to save your changes?");
+    msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Save);
+
+    switch(msgBox.exec()) {
+    case QMessageBox::Save:
+        return ASaveProject();
+    case QMessageBox::Discard:
+        return true;
+    default:
+        return false;
+    }
+}
+
+/* KEYBINDINGS */
+void editorgui::keyPressEvent(QKeyEvent *event)
+{
+    if(isEditorActive) { // Only get keys when in editor
         switch(event->key()) {
         /* Moving cursor */
         case Qt::Key_W: handleWasdKeys(false, -1); break;
@@ -162,70 +176,9 @@ void neobes::keyPressEvent(QKeyEvent *event)
     }
 }
 
-/* Closing NeoBES */
-
-void neobes::closeEvent(QCloseEvent *event) {
-    if(hasEdited) {
-        int wantsToGo = displaySaveDlg();
-        if(!wantsToGo) event->ignore();
-    }
-}
-
-int neobes::displaySaveDlg() {
-    QMessageBox msgBox;
-    msgBox.setWindowTitle("Unsaved Changes");
-    msgBox.setIcon(QMessageBox::Warning);
-    msgBox.setText("The project file has been modified.");
-    msgBox.setInformativeText("Do you want to save your changes?");
-    msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
-    msgBox.setDefaultButton(QMessageBox::Save);
-
-    switch(msgBox.exec()) {
-    case QMessageBox::Save:
-        return ASaveProject();
-    case QMessageBox::Discard:
-        return true;
-    default:
-        return false;
-    }
-}
-
-/* Drag and Drop */
-
-void neobes::dragEnterEvent(QDragEnterEvent *event) {
-    event->acceptProposedAction();
-}
-
-void neobes::dragMoveEvent(QDragMoveEvent *event) {
-    event->acceptProposedAction();
-}
-
-void neobes::dragLeaveEvent(QDragLeaveEvent *event) {
-    event->accept();
-}
-
-void neobes::dropEvent(QDropEvent *event) {
-    const QMimeData *mime(event->mimeData());
-    QString fileName = QDir::toNativeSeparators(QUrl(mime->urls().at(0).toString()).toLocalFile());
-
-    neodata::Log("Loading from drag & drop: " + fileName);
-    int result = neodata::LoadFromBes(fileName);
-    if(result == 0) { drawEditorGUI(); neodata::Log("Loaded project file successfully."); }
-    else QMessageBox::critical(this, "Error on project load", strerror(result));
-}
-
-neobes::~neobes()
-{
-    delete ui;
-}
-
-void neobes::updateLog() {
-    ui->textLog->setPlainText(logHistory);
-}
-
 /* LOAD PROJECT / SAVE PROJECT */
 
-void neobes::ALoadProject()
+void editorgui::ALoadProject()
 {
     if(hasEdited) {
         int wantsToGo = displaySaveDlg();
@@ -248,7 +201,7 @@ void neobes::ALoadProject()
     updateLog();
 }
 
-int neobes::ASaveProject()
+int editorgui::ASaveProject()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save BES Project"), "", tr("Any File (*)"));
     if(fileName.isEmpty()) return 0;
@@ -269,7 +222,7 @@ int neobes::ASaveProject()
 
 /* DOWNLOAD EMU / UPLOAD EMU */
 
-void neobes::ADownloadEmu()
+void editorgui::ADownloadEmu()
 {
     if(hasEdited) {
         int wantsToGo = displaySaveDlg();
@@ -299,7 +252,7 @@ void neobes::ADownloadEmu()
     }
 }
 
-void neobes::AUploadEmu()
+void editorgui::AUploadEmu()
 {
     neodata::Log("Uploading to PCSX2...");
 
@@ -333,7 +286,7 @@ void neobes::AUploadEmu()
 
 /* DOWNLOAD OLM / UPLOAD OLM */
 
-void neobes::ADownloadOLM()
+void editorgui::ADownloadOLM()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save Downloaded OLM"), "", tr("Overlay Module (*.OLM)"));
     if(fileName.isEmpty()) return; // User Cancel
@@ -353,7 +306,7 @@ void neobes::ADownloadOLM()
     };
 }
 
-void neobes::AUploadOLM()
+void editorgui::AUploadOLM()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Load OLM to Upload"), "", tr("Overlay Module (*.OLM)"));
     if(fileName.isEmpty()) return; // User Cancel
@@ -370,47 +323,21 @@ void neobes::AUploadOLM()
     };
 }
 
-/* SETTINGS */
-
-void neobes::ASettingsGUI() {
-    Settings *settings = new Settings();
-    settings->exec();
-}
-
-/* ABOUT */
-
-#include "about.h"
-
-void neobes::AAboutGUI() {
-    About *about = new About();
-    about->show();
-}
-
 /* GUI Core Methods */
 
-void neobes::changeMenu() {
-    if(Records.size() != 0) {
-        isMenu = !isMenu;
-        ui->actionChangeMenu->setEnabled(true);
-
-        if(isMenu) drawMenuGUI();
-        else drawEditorGUI();
-    }
+void editorgui::triggerFileLoadDrag() {
+    // TODO: drag load
 }
 
-void neobes::drawMenuGUI() {
-    ui->stackedWidget->setCurrentIndex(0);
-    ui->actionChangeMenu->setText("Go to Editor");
-}
-
-void neobes::afterProjLoad() {
+void editorgui::afterProjLoad() {
     QString stageNumber = "";
     if(CurrentStage < 9) {
         stageNumber = QString::number(CurrentStage + 1);
     } else {
         stageNumber = QString::number(CurrentStage - 10 + 1) + "-VS";
     }
-    QWidget::setWindowTitle("NeoBES - S" + stageNumber + ": " + projFileName);
+    emit enableDestructive();
+    emit editorReady("NeoBES - S" + stageNumber + ": " + projFileName);
 
     CurrentRecord = 0;
     CurrentVariant = 0;
@@ -454,11 +381,10 @@ QString drawRecord(PLAYER_CODE owner, int start, int length, int interval, int c
 
     drawnRec = drawLine(start, start + length, interval, owner, interval, cursorPos, escapeEditorLines);
 
-    isMenu = true;
     return drawnRec;
 }
 
-void neobes::drawButtonProperties() {
+void editorgui::drawButtonProperties() {
     suggestbutton_t button;
     ui->butProperty->blockSignals(true);
     if(Records[CurrentRecord].variants[MentionedVariant].getButFromSubdot(owners[cursorowner], (cursorpos * 24) + precpos, button)) {
@@ -479,7 +405,7 @@ void neobes::drawButtonProperties() {
     ui->butProperty->blockSignals(false);
 }
 
-void neobes::updateButtonProperties(int row, int column) {
+void editorgui::updateButtonProperties(int row, int column) {
     suggestbutton_t *button;
     Records[CurrentRecord].variants[MentionedVariant].getButRefFromSubdot(owners[cursorowner], (cursorpos * 24) + precpos, &button);
     QString valueChanged = ui->butProperty->item(row, column)->text();
@@ -502,7 +428,7 @@ void neobes::updateButtonProperties(int row, int column) {
     }
 }
 
-void neobes::drawLineProperties() {
+void editorgui::drawLineProperties() {
     int count = 0;
     ui->lineOptions->setRowCount(Records[CurrentRecord].variants[MentionedVariant].lines.size());
     for(const e_suggestline_t &line : Records[CurrentRecord].variants[MentionedVariant].lines) {
@@ -524,13 +450,13 @@ void neobes::drawLineProperties() {
     }
 }
 
-void neobes::updateLineProperties(int row, int column) {
+void editorgui::updateLineProperties(int row, int column) {
     hasEdited = true;
     uint32_t coolTres = (uint32_t)ui->lineOptions->item(row,0)->text().toInt();
     Records[CurrentRecord].variants[MentionedVariant].lines[row].coolmodethreshold = coolTres;
 }
 
-void neobes::drawInfo() {
+void editorgui::drawInfo() {
     int usedSize = neodata::CalcAvailableStorage();
     int avaiSize = StageInfo.buttondataend - StageInfo.buttondatabase + 1;
     int displaySize = avaiSize < usedSize ? avaiSize : usedSize;
@@ -548,9 +474,7 @@ void neobes::drawInfo() {
     ui->recordInput->setMaximum(Records.size() - 1);
 }
 
-void neobes::drawEditorGUI() {
-    ui->stackedWidget->setCurrentIndex(1);
-    ui->actionChangeMenu->setText("Go to Menu");
+void editorgui::drawEditorGUI() {
     drawCommands();
     QString textGUI = Records[CurrentRecord].variants[CurrentVariant].islinked ? QString("Linked to %1<br>").arg(Records[CurrentRecord].variants[CurrentVariant].linknum) : "<br>";
     MentionedVariant = Records[CurrentRecord].variants[CurrentVariant].islinked ? Records[CurrentRecord].variants[CurrentVariant].linknum : CurrentVariant;
@@ -569,14 +493,12 @@ void neobes::drawEditorGUI() {
     drawButtonProperties();
     drawLineProperties();
     ui->display->setText(textGUI);
-
-    isMenu = false;
 }
 
 #include "job.h"
 
 bool once = false;
-void neobes::setupCommandCB() {
+void editorgui::setupCommandCB() {
     ui->comSelector->blockSignals(true);
     if(VSMode) {
 
@@ -589,7 +511,7 @@ void neobes::setupCommandCB() {
     ui->comSelector->blockSignals(false);
 }
 
-void neobes::drawCommands() { // NOTE TO JOO: I left it as it is due to extreme delay when loading :)
+void editorgui::drawCommands() { // NOTE TO JOO: I left it as it is due to extreme delay when loading :)
     if(!once) {setupCommandCB(); once = true;}
     int currentCommandSelect = ui->comSelector->currentIndex();
     int curRow = 0;
@@ -614,7 +536,7 @@ void neobes::drawCommands() { // NOTE TO JOO: I left it as it is due to extreme 
     ui->comTable->blockSignals(false);
 }
 
-void neobes::updateCommandProperties() {
+void editorgui::updateCommandProperties() {
     hasEdited = true;
     int curComSel = ui->comSelector->currentIndex();
     int curCol = ui->comTable->currentColumn();
@@ -660,12 +582,12 @@ void neobes::updateCommandProperties() {
 
 /* GUI Functions */
 
-void neobes::handleDisplayClick() {
+void editorgui::handleDisplayClick() {
     int testPos = ui->display->textCursor().position();
     neodata::Log(QString::number(testPos));
 }
 
-void neobes::handleArrowKeys(bool lr, int inc) {
+void editorgui::handleArrowKeys(bool lr, int inc) {
     if(lr && CurrentRecord+inc >= 0 && CurrentRecord+inc < Records.size()) {
         CurrentRecord += inc;
     }
@@ -674,7 +596,7 @@ void neobes::handleArrowKeys(bool lr, int inc) {
     }
 }
 
-void neobes::handleWasdKeys(bool lr, int inc) {
+void editorgui::handleWasdKeys(bool lr, int inc) {
     if(lr) {
         if(cursorpos+inc >= 0 && cursorpos+inc < Records[CurrentRecord].lengthinsubdots / 24) cursorpos += inc;
         else {
@@ -693,33 +615,33 @@ void neobes::handleWasdKeys(bool lr, int inc) {
     }
 }
 
-void neobes::handlePrecKeys(int inc) {
+void editorgui::handlePrecKeys(int inc) {
     if(precpos+inc >= 0 && precpos+inc < 24) precpos += inc;
 }
 
-void neobes::handleButtonKeys(int buttonId) {
+void editorgui::handleButtonKeys(int buttonId) {
     hasEdited = true;
     if(buttonId == 0) AButtonDelete();
     else Records[CurrentRecord].variants[MentionedVariant].createButton((cursorpos * 24) + precpos, owners[cursorowner], buttonId);
 }
 
 // TODO: Expose variables for managing with cursor?
-void neobes::AButtonCopy() {
+void editorgui::AButtonCopy() {
     suggestbutton_t button; // TODO: Test done without copying it
     if(Records[CurrentRecord].variants[MentionedVariant].getButFromSubdot(owners[cursorowner], (cursorpos * 24) + precpos, button)) copiedButton = button;
 }
 
-void neobes::AButtonCut() {
+void editorgui::AButtonCut() {
     AButtonCopy();
     AButtonDelete();
 }
 
-void neobes::AButtonDelete() {
+void editorgui::AButtonDelete() {
     hasEdited = true;
     Records[CurrentRecord].variants[MentionedVariant].deleteButton((cursorpos * 24) + precpos, owners[cursorowner]);
 }
 
-void neobes::AButtonPaste() { // TODO: Check better solution for Paste
+void editorgui::AButtonPaste() { // TODO: Check better solution for Paste
     suggestbutton_t *pbutton;
 
     AButtonDelete();
@@ -730,17 +652,17 @@ void neobes::AButtonPaste() { // TODO: Check better solution for Paste
     }
 }
 
-void neobes::ALineCreate() {
+void editorgui::ALineCreate() {
     hasEdited = true;
     Records[CurrentRecord].variants[MentionedVariant].createLine((cursorpos * 24) + precpos, (cursorpos * 24) + precpos + 24, owners[cursorowner]);
 }
 
-void neobes::ALineDelete() {
+void editorgui::ALineDelete() {
     hasEdited = true;
     Records[CurrentRecord].variants[MentionedVariant].deleteLine((cursorpos * 24) + precpos, owners[cursorowner]);
 }
 
-void neobes::ACommandCreate() {
+void editorgui::ACommandCreate() {
     hasEdited = true;
     int curComSel = ui->comSelector->currentIndex();
     int curRow = ui->comTable->currentRow();
@@ -755,7 +677,7 @@ void neobes::ACommandCreate() {
     drawCommands();
 }
 
-void neobes::ACommandDelete() {
+void editorgui::ACommandDelete() {
     hasEdited = true;
     int curComSel = ui->comSelector->currentIndex();
     int curRow = ui->comTable->currentRow();
@@ -764,7 +686,7 @@ void neobes::ACommandDelete() {
     drawCommands();
 }
 
-void neobes::ALinkVariant(bool linkAll)
+void editorgui::ALinkVariant(bool linkAll)
 {
     int linkId = QInputDialog::getInt(this, tr("Link Variant"), tr("Type the variant to link to"), 0, 0, 16);
     if(linkId == -1) return; // User Cancel
@@ -793,7 +715,7 @@ void neobes::ALinkVariant(bool linkAll)
     drawEditorGUI();
 }
 
-void neobes::ASetSoundboard()
+void editorgui::ASetSoundboard()
 {
     hasEdited = true;
     int sbId = QInputDialog::getInt(this, tr("Soundboard Change"), tr("Type the soundboard id to change"), 0, 0, Records.size());
@@ -810,6 +732,6 @@ void neobes::ASetSoundboard()
     audio->loadSoundDB(Records[CurrentRecord].soundboardid - 1);
 }
 
-void neobes::APlayVariant(bool ticker) {
+void editorgui::APlayVariant(bool ticker) {
     audio->playVariant(Records[CurrentRecord].variants[MentionedVariant], Records[CurrentRecord].lengthinsubdots, StageInfo.bpm, ticker);
 }

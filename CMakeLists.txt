@@ -26,9 +26,9 @@ set(PROJECT_SOURCES
     ui/about.cpp
     ui/about.h
     ui/about.ui
-    ui/neobes.cpp
-    ui/neobes.h
-    ui/neobes.ui
+
+
+
     ui/settings.cpp
     ui/settings.h
     ui/settings.ui
@@ -57,7 +57,10 @@ set(PROJECT_SOURCES
     resources.qrc
 )
 
-add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
+add_executable(${PROJECT_NAME} ${PROJECT_SOURCES}
+    ui/guimanager.h ui/guimanager.cpp
+    ui/menugui.h ui/menugui.cpp ui/menugui.ui
+    ui/editorgui.h ui/editorgui.cpp ui/editorgui.ui)
 
 # Link necessary libraries
 target_link_libraries(${PROJECT_NAME} PRIVATE
