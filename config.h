@@ -50,17 +50,17 @@ public:
     /* File History */
     QList<FileHistory> getHistory() {
         QList<FileHistory> list;
-        int size = m_settings->beginReadArray("recentFiles");
+        int size = m_recFiles->beginReadArray("recentFiles");
         for (int i = 0; i < size; ++i) {
-            m_settings->setArrayIndex(i);
+            m_recFiles->setArrayIndex(i);
             list.append({
-                m_settings->value("fileName").toString(),
-                m_settings->value("stage").toString(),
-                m_settings->value("fileDate").toString(),
-                m_settings->value("lastUsed").toString()
+                m_recFiles->value("fileName").toString(),
+                m_recFiles->value("stage").toString(),
+                m_recFiles->value("fileDate").toString(),
+                m_recFiles->value("lastUsed").toString()
             });
         }
-        m_settings->endArray();
+        m_recFiles->endArray();
         return list;
     }
 
@@ -74,15 +74,15 @@ public:
             list.removeLast();
         }
 
-        m_settings->beginWriteArray("recentFiles");
+        m_recFiles->beginWriteArray("recentFiles");
         for (int i = 0; i < list.size(); ++i) {
-            m_settings->setArrayIndex(i);
-            m_settings->setValue("fileName", list[i].fileName);
-            m_settings->setValue("stage", list[i].stage);
-            m_settings->setValue("fileDate", list[i].fileDate);
-            m_settings->setValue("lastUsed", list[i].lastUsed);
+            m_recFiles->setArrayIndex(i);
+            m_recFiles->setValue("fileName", list[i].fileName);
+            m_recFiles->setValue("stage", list[i].stage);
+            m_recFiles->setValue("fileDate", list[i].fileDate);
+            m_recFiles->setValue("lastUsed", list[i].lastUsed);
         }
-        m_settings->endArray();
+        m_recFiles->endArray();
 
         emit historyChanged();
     }
@@ -98,9 +98,11 @@ signals:
 
 private:
     explicit SettingsManager() {
-        m_settings = new QSettings("Zungle", "NeoBES");
+        m_settings = new QSettings("NeoBES", "config");
+        m_recFiles = new QSettings("NeoBES", "history");
     }
     QSettings *m_settings;
+    QSettings *m_recFiles;
 };
 
 #endif // CONFIG_H
