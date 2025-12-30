@@ -7,6 +7,7 @@
 #include "io/ptr2reader.h"
 #include "io/emuinterfacer.h"
 #include "types.h"
+#include "config.h"
 
 #include <fstream>
 
@@ -18,6 +19,7 @@ extern std::vector<e_suggestrecord_t> Records;
 extern std::vector<std::vector<commandbuffer_t>> ModeCommands;
 extern std::vector<scenemode_t> Modes;
 extern currentstage_t StageInfo;
+extern FileHistory ProjectInfo;
 extern uint32_t ModeSize;
 extern int subcount; // remove
 extern int OopsSize;

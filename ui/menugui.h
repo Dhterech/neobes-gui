@@ -16,15 +16,19 @@ public:
     explicit menugui(QWidget *parent = nullptr);
     ~menugui();
 
-public: signals:
+signals:
     // buttons
     void ADownloadEmu();
     void ALoadProject();
     void ASettingsGUI();
     void AAboutGUI();
+    // loadsig
+    void loadFileFromRecents(const QString &filePath);
 
 private:
     Ui::menugui *ui;
+    void setupRecentFiles();
+    void onTreeViewClicked(const QModelIndex &index);
 };
 
 #endif // MENUGUI_H

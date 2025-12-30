@@ -26,14 +26,16 @@ public:
     void toggleActive();
 
 signals:
-    void editorReady(const QString &title);
+    void editorReady();
+    void setWindowName(const QString &title);
     void enableDestructive();
     void disableDestructive();
 
 public slots:
-    void triggerFileLoadDrag();
+    void loadProject(QString file);
     // Main functions
     int ASaveProject();
+    int ASaveAsProject();
     void ALoadProject();
 
     void AUploadOLM();
@@ -83,6 +85,7 @@ private:
     void drawMenuGUI();
 
     void setupCommandCB();
+    void setProjectWindowName();
 
 protected:
     void closeEvent(QCloseEvent *event) override;

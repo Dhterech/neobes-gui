@@ -9,6 +9,7 @@
 
 struct FileHistory {
     QString fileName;
+    QString prettyFileName;
     QString stage;
     QString fileDate;
     QString lastUsed;
@@ -55,6 +56,7 @@ public:
             m_recFiles->setArrayIndex(i);
             list.append({
                 m_recFiles->value("fileName").toString(),
+                m_recFiles->value("prettyFileName").toString(),
                 m_recFiles->value("stage").toString(),
                 m_recFiles->value("fileDate").toString(),
                 m_recFiles->value("lastUsed").toString()
@@ -78,6 +80,7 @@ public:
         for (int i = 0; i < list.size(); ++i) {
             m_recFiles->setArrayIndex(i);
             m_recFiles->setValue("fileName", list[i].fileName);
+            m_recFiles->setValue("prettyFileName", list[i].prettyFileName);
             m_recFiles->setValue("stage", list[i].stage);
             m_recFiles->setValue("fileDate", list[i].fileDate);
             m_recFiles->setValue("lastUsed", list[i].lastUsed);

@@ -1,5 +1,6 @@
 #include "menugui.h"
 #include "ui_menugui.h"
+#include "config.h"
 
 #include <QPushButton>
 
@@ -15,9 +16,59 @@ menugui::menugui(QWidget *parent)
     connect(ui->loademuBtn, &QPushButton::clicked, this, &menugui::ADownloadEmu);
     connect(ui->settingsBtn, &QPushButton::clicked, this, &menugui::ASettingsGUI);
     connect(ui->infobackBtn, &QPushButton::clicked, this, &menugui::AAboutGUI);
+
+    // Load Recent Files
+    connect(ui->recentFilesView, &QTreeView::doubleClicked, this, &menugui::onTreeViewClicked);
+
+    setupRecentFiles();
 }
 
 menugui::~menugui()
 {
     delete ui;
+}
+
+#include <QStandardItemModel>
+#include <QFileIconProvider>
+#include <QHeaderView>
+
+void menugui::setupRecentFiles() {
+    QStandardItemModel* model = new QStandardItemModel(0, 4, ui->recentFilesView);
+    model->setHorizontalHeaderLabels({"Filename", "Stage", "Created", "Last Used"});
+
+    QFileIconProvider iconProvider;
+
+    for (const FileHistory &entry : SettingsManager::instance().getHistory()) {
+        QList<QStandardItem*> row;
+
+        QIcon fileIcon = iconProvider.icon(QFileInfo(entry.fileName));
+        QStandardItem* nameItem = new QStandardItem(fileIcon, entry.prettyFileName);
+        QStandardItem* stageItem = new QStandardItem(entry.stage);
+        QStandardItem* createdItem = new QStandardItem(entry.fileDate);
+        QStandardItem* usedItem = new QStandardItem(entry.lastUsed);
+
+        row << nameItem << stageItem << createdItem << usedItem;
+        model->appendRow(row);
+    }
+
+    ui->recentFilesView->setModel(model);
+
+    ui->recentFilesView->setEditTriggers(QAbstractItemView::NoEditTriggers); // Read only
+    ui->recentFilesView->setSortingEnabled(true);                           // Allow sorting by date
+    ui->recentFilesView->setAlternatingRowColors(true);                     // Better readability
+    ui->recentFilesView->setRootIsDecorated(false);                         // Removes tree arrows (flat list)
+
+    ui->recentFilesView->header()->setSectionResizeMode(0, QHeaderView::Stretch);
+    ui->recentFilesView->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+}
+
+void menugui::onTreeViewClicked(const QModelIndex &index) {
+    if (!index.isValid()) return;
+
+    int aIndex = index.row();
+    QString absolutePath = SettingsManager::instance().getHistory().at(aIndex).fileName;
+
+    if (!absolutePath.isEmpty()) {
+        emit loadFileFromRecents(absolutePath);
+    }
 }

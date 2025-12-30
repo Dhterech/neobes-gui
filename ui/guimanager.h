@@ -18,9 +18,13 @@ public:
     guimanager(QWidget *parent = nullptr);
 
 public slots:
-    void handleEditorReady(const QString &title);
+    void handleEditorReady();
+    void handleSetWindowName(const QString &title);
     void enableDestructiveActions();
     void disableDestructiveActions();
+
+signals:
+    void loadFromFile(const QString &filePath);
 
 private slots:
     void toggleView();
@@ -38,12 +42,18 @@ private:
     editorgui *editorWidget;
 
     // Actions
-    QAction *actionLoad, *actionSave, *actionExit;
+    QAction *actionLoad, *actionSave, *actionSaveAs, *actionExit;
     QAction *actionUploadOLM, *actionDownloadOLM;
     QAction *actionUploadEmu, *actionDownloadEmu;
     QAction *actionLink, *actionLinkAll;
     QAction *actionSetRecSB, *actionPlayRecord, *actionPlayRecordTicker;
     QAction *actionChangeMenu, *actionSettings, *actionAbout;
+
+protected:
+    void dragEnterEvent(QDragEnterEvent *event) override;
+    void dragMoveEvent(QDragMoveEvent *event) override;
+    void dragLeaveEvent(QDragLeaveEvent *event) override;
+    void dropEvent(QDropEvent *event) override;
 };
 
 #endif // GUIMANAGER_H

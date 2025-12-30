@@ -5,6 +5,7 @@ std::vector<e_suggestrecord_t> Records;
 std::vector<std::vector<commandbuffer_t>> ModeCommands;
 std::vector<scenemode_t> Modes;
 currentstage_t StageInfo;
+FileHistory ProjectInfo;
 uint32_t ModeSize;
 int OopsSize;
 int CurrentRegion;
@@ -13,7 +14,6 @@ bool VSMode = false;
 bool PALMode = false;
 bool SUBMode = false;
 QString logHistory;
-QString projFileName;
 
 int subcount; // remove later
 QString modestage; // fixme: you can mix other stages info
@@ -69,6 +69,19 @@ void neodata::ImportStageInfo() {
     //numowners = (isVSMode) ? 1 : 3;
     OopsSize = (VSMode ? 3 : 2) * 6 * sizeof(suggestbutton_t);
     ModeSize = stages[CurrentStage].modescenes;
+}
+
+FileHistory getFileHistory(QString tmpFileName, int stage) {
+    FileHistory out;
+    QFileInfo fileInfo(tmpFileName);
+
+    out.fileName = fileInfo.absoluteFilePath();
+    out.prettyFileName = fileInfo.fileName();
+    out.fileDate = fileInfo.lastModified().toString("yyyy-MM-dd HH:mm");
+    out.lastUsed = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm");
+    out.stage = stages[stage].name;
+
+    return out;
 }
 
 /* Import/Export */
@@ -135,6 +148,8 @@ int neodata::SaveToBes(QString fileName) {
         for(int i = 9; i < ModeSize; i++) saveScene(ModeCommands[i]); // Stage 8 / VS
     }
 
+    ProjectInfo = getFileHistory(fileName, CurrentStage);
+
     rawFile.close();
     return 0;
 }
@@ -152,8 +167,8 @@ int neodata::LoadFromBes(QString fileName) {
     rawFile.open(fileName.toUtf8(), std::ios_base::in | std::ios_base::binary);
     if(!rawFile.is_open()) return errno;
 
-    QFileInfo fileInfo(fileName);
-    projFileName = fileInfo.fileName();
+    ProjectInfo = getFileHistory(fileName, CurrentStage);
+    SettingsManager::instance().addFileToHistory(ProjectInfo);
 
     CloseProject();
 
@@ -251,7 +266,7 @@ int neodata::LoadFromEmu() {
     CurrentRegion = pcsx2reader::GetGameRegion();
     if(CurrentRegion == -1) return 5;
 
-    projFileName = "New Project";
+    ProjectInfo.prettyFileName = "New Project";
 
     Log(" Status: Reading current stage...");
 

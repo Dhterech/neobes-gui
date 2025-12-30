@@ -13,6 +13,7 @@ bool isEditorActive = false;
 int cursorpos = 0;
 int cursorowner = 0;
 int precpos = 0;
+QString fileName;
 
 int numowners = 3;
 PLAYER_CODE owners[3] = {PLAYER_CODE::PCODE_TEACHER, PLAYER_CODE::PCODE_PARA, PLAYER_CODE::PCODE_BOXY};
@@ -128,7 +129,7 @@ int editorgui::displaySaveDlg() {
 
     switch(msgBox.exec()) {
     case QMessageBox::Save:
-        return ASaveProject();
+        return ASaveAsProject();
     case QMessageBox::Discard:
         return true;
     default:
@@ -178,6 +179,28 @@ void editorgui::keyPressEvent(QKeyEvent *event)
 
 /* LOAD PROJECT / SAVE PROJECT */
 
+void editorgui::loadProject(QString tmpFileName)
+{
+    if(hasEdited) {
+        int wantsToGo = displaySaveDlg();
+        if(!wantsToGo) return;
+    }
+
+    if(tmpFileName.isEmpty()) return;
+    neodata::Log("Loading project from file: " + tmpFileName);
+
+    int result = neodata::LoadFromBes(tmpFileName);
+    if(result == 0) {
+        hasEdited = false;
+        afterProjLoad();
+        drawEditorGUI();
+        neodata::Log("Loaded project file successfully.");
+    }
+    else QMessageBox::critical(this, "Error on project load", strerror(result));
+
+    updateLog();
+}
+
 void editorgui::ALoadProject()
 {
     if(hasEdited) {
@@ -185,11 +208,11 @@ void editorgui::ALoadProject()
         if(!wantsToGo) return;
     }
 
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open BES Project"), "", tr("Any File (*)"));
-    if(fileName.isEmpty()) return;
-    neodata::Log("Loading project from file: " + fileName);
+    QString tmpFileName = QFileDialog::getOpenFileName(this, tr("Open BES Project"), "", tr("Any File (*)"));
+    if(tmpFileName.isEmpty()) return;
+    neodata::Log("Loading project from file: " + tmpFileName);
 
-    int result = neodata::LoadFromBes(fileName);
+    int result = neodata::LoadFromBes(tmpFileName);
     if(result == 0) {
         hasEdited = false;
         afterProjLoad();
@@ -203,13 +226,35 @@ void editorgui::ALoadProject()
 
 int editorgui::ASaveProject()
 {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save BES Project"), "", tr("Any File (*)"));
-    if(fileName.isEmpty()) return 0;
+    if(fileName.isEmpty()) return editorgui::ASaveAsProject();
     neodata::Log("Saving Project to: " + fileName);
 
     int result = neodata::SaveToBes(fileName);
-    if(result == 0) {neodata::Log("Saved project file successfully.");}
+    if(result == 0) {
+        neodata::Log("Saved project file successfully.");
+    }
     else {
+        QMessageBox::critical(this, "Error on project save", strerror(result));
+        neodata::Log("Could not save project." + QString(strerror(result)));
+        return 0;
+    }
+
+    hasEdited = false;
+    updateLog();
+    return 1;
+}
+
+int editorgui::ASaveAsProject()
+{
+    QString tmpFileName = QFileDialog::getSaveFileName(this, tr("Save BES Project"), "", tr("Any File (*)"));
+    if(tmpFileName.isEmpty()) return 0;
+    neodata::Log("Saving Project to: " + tmpFileName);
+
+    int result = neodata::SaveToBes(tmpFileName);
+    if(result == 0) {
+        neodata::Log("Saved project file successfully.");
+        setProjectWindowName();
+    } else {
         QMessageBox::critical(this, "Error on project save", strerror(result));
         neodata::Log("Could not save project." + QString(strerror(result)));
         return 0;
@@ -288,8 +333,8 @@ void editorgui::AUploadEmu()
 
 void editorgui::ADownloadOLM()
 {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Downloaded OLM"), "", tr("Overlay Module (*.OLM)"));
-    if(fileName.isEmpty()) return; // User Cancel
+    QString tmpFileName = QFileDialog::getSaveFileName(this, tr("Save Downloaded OLM"), "", tr("Overlay Module (*.OLM)"));
+    if(tmpFileName.isEmpty()) return; // User Cancel
     int size = QInputDialog::getInt(this, tr("Type the OLM file size"), tr("Type file size"), 0, 0, 52428800);
     if(size == -1) return; // User Cancel
 
@@ -325,19 +370,20 @@ void editorgui::AUploadOLM()
 
 /* GUI Core Methods */
 
-void editorgui::triggerFileLoadDrag() {
-    // TODO: drag load
-}
-
-void editorgui::afterProjLoad() {
+void editorgui::setProjectWindowName() {
     QString stageNumber = "";
     if(CurrentStage < 9) {
         stageNumber = QString::number(CurrentStage + 1);
     } else {
         stageNumber = QString::number(CurrentStage - 10 + 1) + "-VS";
     }
+    emit setWindowName("NeoBES - S" + stageNumber + ": " + ProjectInfo.prettyFileName);
+}
+
+void editorgui::afterProjLoad() {
+    setProjectWindowName();
     emit enableDestructive();
-    emit editorReady("NeoBES - S" + stageNumber + ": " + projFileName);
+    emit editorReady();
 
     CurrentRecord = 0;
     CurrentVariant = 0;
@@ -430,6 +476,7 @@ void editorgui::updateButtonProperties(int row, int column) {
 
 void editorgui::drawLineProperties() {
     int count = 0;
+    bool isSelected = false;
     ui->lineOptions->setRowCount(Records[CurrentRecord].variants[MentionedVariant].lines.size());
     for(const e_suggestline_t &line : Records[CurrentRecord].variants[MentionedVariant].lines) {
         QTableWidgetItem *coolTres = new QTableWidgetItem(QString::number((int32_t)line.coolmodethreshold));
@@ -444,10 +491,13 @@ void editorgui::drawLineProperties() {
         ui->lineOptions->setCellWidget(count,2,lineLabel);
         count++;
 
-        if(owners[cursorowner] == line.owner && (cursorpos * 24 >= line.timestamp_start && cursorpos * 24 <= line.timestamp_end)) {
+        if(owners[cursorowner] == line.owner && (cursorpos * 24 >= line.timestamp_start && cursorpos * 24 < line.timestamp_end)) {
+            isSelected = true;
             ui->lineOptions->selectRow(count-1);
         }
     }
+
+    if(!isSelected) ui->lineOptions->clearSelection();
 }
 
 void editorgui::updateLineProperties(int row, int column) {
