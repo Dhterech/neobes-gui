@@ -232,6 +232,7 @@ int editorgui::ASaveProject()
     int result = neodata::SaveToBes(fileName);
     if(result == 0) {
         neodata::Log("Saved project file successfully.");
+        hasEdited = false;
     }
     else {
         QMessageBox::critical(this, "Error on project save", strerror(result));
@@ -239,7 +240,6 @@ int editorgui::ASaveProject()
         return 0;
     }
 
-    hasEdited = false;
     updateLog();
     return 1;
 }
@@ -383,7 +383,7 @@ void editorgui::setProjectWindowName() {
 void editorgui::afterProjLoad() {
     setProjectWindowName();
     emit enableDestructive();
-    emit editorReady();
+    if(!isEditorActive) emit editorReady();
 
     CurrentRecord = 0;
     CurrentVariant = 0;
@@ -740,8 +740,12 @@ void editorgui::ALinkVariant(bool linkAll)
 {
     int linkId = QInputDialog::getInt(this, tr("Link Variant"), tr("Type the variant to link to"), 0, 0, 16);
     if(linkId == -1) return; // User Cancel
+    hasEdited = true;
 
-    if(Records[CurrentRecord].variants[linkId].islinked) {
+    if(linkId == CurrentVariant && !linkAll) {
+        linkId = -1; // Unlink
+    }
+    else if(Records[CurrentRecord].variants[linkId].islinked) {
         QMessageBox::warning(this, "Link Variant", "You can't link a linked variant!");
         neodata::Log("Can't link linked variant!");
         updateLog();
@@ -750,15 +754,9 @@ void editorgui::ALinkVariant(bool linkAll)
 
     if(linkAll) {
         for(int i = 0; i < 17; i++) {
-            hasEdited = true;
             if(i != linkId) Records[CurrentRecord].variants[i].setLink(linkId);
         }
     } else {
-        if(linkId == CurrentVariant) {
-            linkId = -1; // Unlink
-        }
-
-        hasEdited = true;
         Records[CurrentRecord].variants[CurrentVariant].setLink(linkId);
     }
 
