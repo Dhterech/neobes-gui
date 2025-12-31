@@ -122,11 +122,7 @@ bool pcsx2upload(std::vector<e_suggestrecord_t> Records, std::vector<scenemode_t
         ps2record.soundboardid = record.soundboardid;
         memcpy(ps2record.vs_data, record.vs_data, sizeof(ps2record.vs_data));
 
-        if(record.type == 1 && !VSMode) { // Good, Bad & Awful
-            updateRecordScCommands(1, 3, record.address, uploadPos, ModeCommands);
-        } else { // Other scenes
-            updateRecordScCommands(record.type, record.type, record.address, uploadPos, ModeCommands);
-        }
+        updateRecordScCommands(0, ModeSize - 1, record.address, uploadPos, ModeCommands);
 
         UPLOAD(uploadPos, ps2record);
     }
