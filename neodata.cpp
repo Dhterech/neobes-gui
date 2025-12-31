@@ -16,7 +16,6 @@ bool SUBMode = false;
 QString logHistory;
 
 int subcount; // remove later
-QString modestage; // fixme: you can mix other stages info
 
 // USA PAL JP JP-PROTO
 const int GAME_FRAMERATE[4] = {60, 50, 60, 60};
@@ -247,11 +246,10 @@ int neodata::SaveToEmu() {
     uint32_t loadedStage = 0xFFFF;
     pcsx2reader::read(CURRENT_STAGE[CurrentRegion], &loadedStage, 4);
     if(loadedStage != CurrentStage + 1) return 3;
+    ImportStageInfo();
 
-    if(Modes.size() == 0 || modestage != StageInfo.name) { // If we don't have modes for this
-        pcxs2GetModelist(StageInfo.stagemodelistbase, ModeSize); // Project File doesn't have modes
-        modestage = StageInfo.name;
-    }
+    // Project File doesn't have modes in it. If it's zeroed out, get from the running emulator
+    if(Modes.size() == 0) pcxs2GetModelist(StageInfo.stagemodelistbase, ModeSize);
 
     try {
         bool result = pcsx2upload(Records, Modes, ModeCommands, StageInfo, VSMode, PALMode, SUBMode, OopsSize, ModeSize);
