@@ -335,8 +335,10 @@ void editorgui::ADownloadOLM()
 {
     QString tmpFileName = QFileDialog::getSaveFileName(this, tr("Save Downloaded OLM"), "", tr("Overlay Module (*.OLM)"));
     if(tmpFileName.isEmpty()) return; // User Cancel
-    int size = QInputDialog::getInt(this, tr("Type the OLM file size"), tr("Type file size"), 0, 0, 52428800);
-    if(size == -1) return; // User Cancel
+
+    bool userConfirmation;
+    int size = QInputDialog::getInt(this, tr("Type the OLM file size"), tr("Type file size"), 0, 0, 52428800, 1, &userConfirmation);
+    if(!userConfirmation) return; // User Cancel 2
 
     switch(neodata::DownloadOLMFromEmu(fileName, size)) {
     case 1:
@@ -355,6 +357,7 @@ void editorgui::AUploadOLM()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Load OLM to Upload"), "", tr("Overlay Module (*.OLM)"));
     if(fileName.isEmpty()) return; // User Cancel
+
     switch(neodata::UploadOLMToEmu(fileName)) {
     case false:
         QMessageBox::critical(this, "Error on upload", "NeoBES caused an error while uploading to PCSX2.");
@@ -502,7 +505,7 @@ void editorgui::drawLineProperties() {
 
 void editorgui::updateLineProperties(int row, int column) {
     hasEdited = true;
-    uint32_t coolTres = (uint32_t)ui->lineOptions->item(row,0)->text().toInt();
+    int32_t coolTres = ui->lineOptions->item(row,0)->text().toInt();
     Records[CurrentRecord].variants[MentionedVariant].lines[row].coolmodethreshold = coolTres;
 }
 
@@ -738,9 +741,9 @@ void editorgui::ACommandDelete() {
 
 void editorgui::ALinkVariant(bool linkAll)
 {
-    int linkId = QInputDialog::getInt(this, tr("Link Variant"), tr("Type the variant to link to"), 0, 0, 16);
-    if(linkId == -1) return; // User Cancel
-    hasEdited = true;
+    bool userConfirmation;
+    int linkId = QInputDialog::getInt(this, tr("Link Variant"), tr("Type the variant to link to"), 0, 0, 16, 1, &userConfirmation);
+    if(!userConfirmation) return;
 
     if(linkId == CurrentVariant && !linkAll) {
         linkId = -1; // Unlink
@@ -752,6 +755,7 @@ void editorgui::ALinkVariant(bool linkAll)
         return;
     }
 
+    hasEdited = true;
     if(linkAll) {
         for(int i = 0; i < 17; i++) {
             if(i != linkId) Records[CurrentRecord].variants[i].setLink(linkId);
@@ -765,9 +769,9 @@ void editorgui::ALinkVariant(bool linkAll)
 
 void editorgui::ASetSoundboard()
 {
-    hasEdited = true;
-    int sbId = QInputDialog::getInt(this, tr("Soundboard Change"), tr("Type the soundboard id to change"), 0, 0, Records.size());
-    if(sbId == -1) return; // User Cancel
+    bool userConfirmation;
+    int sbId = QInputDialog::getInt(this, tr("Soundboard Change"), tr("Type the soundboard id to change"), 0, 0, Records.size(), 1, &userConfirmation);
+    if(!userConfirmation) return;
 
     if(sbId >= Soundboards.size()) {
         QMessageBox::critical(this, "Soundboard Change", "Invalid soundboard number!");
@@ -776,6 +780,7 @@ void editorgui::ASetSoundboard()
         return;
     }
 
+    hasEdited = true;
     Records[CurrentRecord].soundboardid = sbId;
     audio->loadSoundDB(Records[CurrentRecord].soundboardid - 1);
 }
