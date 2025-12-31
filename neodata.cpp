@@ -19,7 +19,7 @@ int subcount; // remove later
 
 // USA PAL JP JP-PROTO
 const int GAME_FRAMERATE[4] = {60, 50, 60, 60};
-const int RESOURCE_LIST_BASE[4] = {0x1C49480, 0x1C46100, 0x1C598e80, 0x1C5B380};
+const int RESOURCE_LIST_BASE[4] = {0x1C49480, 0x1C46100, 0x1C59880, 0x1C5B380};
 const int CURRENT_STAGE[4] = {0x386930, 0x1C63A74, 0x396DCC, 0x3998dc};
 
 void neodata::Log(QString string) {
