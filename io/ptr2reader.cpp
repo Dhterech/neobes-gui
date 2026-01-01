@@ -246,18 +246,18 @@ void pcsx2DwnlRecord(uint32_t record_addr, e_suggestrecord_t &editor_record) {
     ps2RecordToEditor(ps2_record, editor_record);
 }
 
-void pcsx2ParseComRecords() {
+void pcsx2ParseComRecords(int scene_start, int scene_end) {
     e_suggestrecord_t record;
-
-    for(int type = 0; type < ModeCommands.size(); type++) {
-        if(!VSMode && (type == 2 || type == 3)) continue; // Skip BAD & Awful
+    for(int type = scene_start; type < scene_end; type++) {
         for(const commandbuffer_t &buffer : ModeCommands[type]) {
             if(buffer.cmd_id != SCENECMD_SETRECORD && buffer.cmd_id != SCENECMD_ACTIVATE) continue;
             if(buffer.cmd_id == SCENECMD_ACTIVATE && buffer.arg1 != 0xE) continue; // Get only preload record
             
             uint32_t raddr = buffer.cmd_id == SCENECMD_SETRECORD ? buffer.arg4 : buffer.arg2;
+
             bool alreadyLoaded = false;
             for(const e_suggestrecord_t &r : Records) {if(r.address == raddr) {alreadyLoaded = true; break;}}
+
             if(raddr > OLM_LINK_ADDRESS && !alreadyLoaded) {
                 pcsx2DwnlRecord(raddr, record);
                 record.type = type;
@@ -303,6 +303,7 @@ void getProjectRecordAddresses() {
 
             uint32_t raddr = buffer.cmd_id == SCENECMD_SETRECORD ? buffer.arg4 : buffer.arg2;
             bool alreadyLoaded = raddr == lastRecord;
+
             if(raddr > OLM_LINK_ADDRESS && !alreadyLoaded) { // ugly ptr2besms fixup :(
                 if(recordCount > Records.size()) break; // FIXME
                 Records[recordCount].address = raddr;

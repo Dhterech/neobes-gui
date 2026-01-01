@@ -83,6 +83,68 @@ FileHistory getFileHistory(QString tmpFileName, int stage) {
     return out;
 }
 
+/* Old Data Trickery */
+
+int neodata::FixBesmsProject() {
+    if(!pcsx2reader::IsEmuOpen()) return 1;
+
+    CurrentRegion = pcsx2reader::GetGameRegion();
+    if(CurrentRegion == 2 && SettingsManager::instance().bhvDebugJP()) CurrentRegion = 3;
+    if(CurrentRegion == -1) return 5;
+
+    uint32_t loadedStage = 0xFFFF;
+    pcsx2reader::read(CURRENT_STAGE[CurrentRegion], &loadedStage, 4);
+    if(loadedStage != CurrentStage + 1) return 3;
+    ImportStageInfo();
+
+    neodata::Log(" Status: Initiating old BESMS project fix...");
+
+    // Store old scene jobs
+    std::vector<std::vector<commandbuffer_t>> OldModeCommands;
+    OldModeCommands = ModeCommands;
+
+    // Clear and update with PCSX2 data (with the necessary data we need)
+    ModeCommands.clear();
+    Modes.clear();
+    pcxs2GetModelist(StageInfo.stagemodelistbase, ModeSize);
+    pcsx2GetComBuffers();
+
+    for(int scene = 0; scene < 9; scene++) {
+        for(int buffer = 0; buffer < ModeCommands[scene].size(); buffer++) {
+            std::vector<commandbuffer_t> &sceneJobs = ModeCommands[scene];
+            std::vector<commandbuffer_t> &oldSceneJobs = OldModeCommands[scene];
+
+            if(sceneJobs[buffer].cmd_id == SCENECMD_SETRECORD || (sceneJobs[buffer].cmd_id == SCENECMD_ACTIVATE && sceneJobs[buffer].arg1 == 0xE)) {
+                // Replace the scene addresses with the new one
+                uint32_t oldraddr = oldSceneJobs[buffer].cmd_id == SCENECMD_SETRECORD ? oldSceneJobs[buffer].arg4 : oldSceneJobs[buffer].arg2;
+                uint32_t raddr = sceneJobs[buffer].cmd_id == SCENECMD_SETRECORD ? sceneJobs[buffer].arg4 : sceneJobs[buffer].arg2;
+
+                for(e_suggestrecord_t &record : Records) {
+                    if(record.address == oldraddr) record.address = raddr;
+                }
+            } else {
+                // Replace the scene job with the original one
+                sceneJobs = oldSceneJobs;
+            }
+        }
+    }
+
+    // Get every record and delete duplicate records
+    for (int record = 0; record < Records.size(); record++) {
+        for (int record2 = record+1; record2 < Records.size(); record2++) {
+            if(Records[record2].address == Records[record].address) {
+                neodata::Log("[BESMSFix] Deleting a duplicate record: " + QString::number(record2) + " has same address as " + QString::number(record));
+                Records.erase(Records.begin() + record2);
+            }
+        }
+    }
+
+    // As the records and scene jobs are correctly fixed
+    // It is now able to load the missing records if needed
+    if (ModeSize > 8) pcsx2ParseComRecords(10, ModeSize-1);
+    return 0;
+}
+
 /* Import/Export */
 
 std::fstream rawFile;
@@ -232,6 +294,10 @@ int neodata::LoadFromBes(QString fileName) {
     rawFile.close();
 
     getProjectRecordAddresses();
+
+    // Old project needs upgrade, warn user
+    if(ModeSize != stages[CurrentStage].modescenes) return 254;
+
     return 0;
 }
 #undef READ
@@ -285,7 +351,7 @@ int neodata::LoadFromEmu() {
     try {
         pcxs2GetModelist(StageInfo.stagemodelistbase, ModeSize);
         pcsx2GetComBuffers();
-        pcsx2ParseComRecords();
+        pcsx2ParseComRecords(0, ModeSize);
         pcsx2GetSoundboards(hdlistbase, bdlistbase, numhd);
         pcsx2GetKeytables(StageInfo.keytablebase, numhd, 0);
     } catch(...) { return 2; }

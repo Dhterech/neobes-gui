@@ -28,8 +28,8 @@ public:
 signals:
     void editorReady();
     void setWindowName(const QString &title);
-    void enableDestructive();
-    void disableDestructive();
+    void setDestructive(const bool &state);
+    void setOldPatching(const bool &state);
 
 public slots:
     void loadProject(QString file);
@@ -47,6 +47,7 @@ public slots:
     void ALinkVariant(bool linkAll);
     void ASetSoundboard();
     void APlayVariant(bool ticker);
+    void APatchOldProj();
 
 private slots:
     // Internal

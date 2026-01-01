@@ -38,6 +38,7 @@ public:
     void static ImportStageInfo();
     uint32_t static CalcAvailableStorage();
 
+    int static FixBesmsProject();
     int static LoadFromBes(QString fileName);
     int static LoadFromEmu();
     //int static LoadFromOlm(QString fileName);

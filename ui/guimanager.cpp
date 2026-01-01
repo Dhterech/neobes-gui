@@ -40,14 +40,15 @@ guimanager::guimanager(QWidget *parent) : QMainWindow(parent) {
     // Editor Signals
     connect(editorWidget, &editorgui::editorReady, this, &guimanager::handleEditorReady);
     connect(editorWidget, &editorgui::setWindowName, this, &guimanager::handleSetWindowName);
-    connect(editorWidget, &editorgui::enableDestructive, this, &guimanager::enableDestructiveActions);
-    connect(editorWidget, &editorgui::disableDestructive, this, &guimanager::disableDestructiveActions);
+    connect(editorWidget, &editorgui::setDestructive, this, &guimanager::setDestructiveActions);
+    connect(editorWidget, &editorgui::setOldPatching, this, &guimanager::setPatchingOldProj);
     connect(this, &guimanager::loadFromFile, editorWidget, &editorgui::loadProject);
 
     // Editor Oriented Actions
     connect(actionLoad, &QAction::triggered, editorWidget, &editorgui::ALoadProject);
     connect(actionSave, &QAction::triggered, editorWidget, &editorgui::ASaveProject);
     connect(actionSaveAs, &QAction::triggered, editorWidget, &editorgui::ASaveAsProject);
+    connect(actionPatchOldProj, &QAction::triggered, editorWidget, &editorgui::APatchOldProj);
 
     connect(actionUploadEmu, &QAction::triggered, editorWidget, &editorgui::AUploadEmu);
     connect(actionUploadOLM, &QAction::triggered, editorWidget, &editorgui::AUploadOLM);
@@ -61,7 +62,8 @@ guimanager::guimanager(QWidget *parent) : QMainWindow(parent) {
     connect(actionPlayRecordTicker, &QAction::triggered, editorWidget, [=, this](){editorWidget->APlayVariant(true);});
 
     // Disable actions that should only be enabled when project loaded;
-    disableDestructiveActions();
+    setDestructiveActions(false);
+    setPatchingOldProj(false);
 }
 
 /* MENU BAR */
@@ -120,6 +122,9 @@ void guimanager::createActions() {
     actionAbout->setShortcut(QKeySequence("F1"));
 
     actionExit = new QAction(QIcon::fromTheme(QIcon::ThemeIcon::ApplicationExit), "Exit", this);
+
+    // Others
+    actionPatchOldProj = new QAction("Fix Old BESMS Project", this);
 }
 
 void guimanager::createMenus() {
@@ -148,6 +153,8 @@ void guimanager::createMenus() {
     toolsMenu->addAction(actionPlayRecordTicker);
     toolsMenu->addAction(actionPlayRecord);
     toolsMenu->addAction(actionSetRecSB);
+    toolsMenu->addSeparator();
+    toolsMenu->addAction(actionPatchOldProj);
 
     // View Menu
     QMenu *viewMenu = menuBar()->addMenu("&View");
@@ -164,10 +171,7 @@ void guimanager::toggleView() {
     actionChangeMenu->setText(nextIndex == 0 ? "Show Editor" : "Show Menu");
 }
 
-void guimanager::enableDestructiveActions() { setDestructive(true); }
-void guimanager::disableDestructiveActions() { setDestructive(false); }
-
-void guimanager::setDestructive(bool destructive) {
+void guimanager::setDestructiveActions(const bool &destructive) {
     actionSave->setEnabled(destructive);
     actionSaveAs->setEnabled(destructive);
     actionUploadEmu->setEnabled(destructive);
@@ -201,6 +205,10 @@ void guimanager::handleEditorReady() {
 
 void guimanager::handleSetWindowName(const QString &title) {
     this->setWindowTitle(title);
+}
+
+void guimanager::setPatchingOldProj(const bool &state) {
+    actionPatchOldProj->setEnabled(state);
 }
 
 /* Drag and Drop */

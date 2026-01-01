@@ -20,8 +20,8 @@ public:
 public slots:
     void handleEditorReady();
     void handleSetWindowName(const QString &title);
-    void enableDestructiveActions();
-    void disableDestructiveActions();
+    void setDestructiveActions(const bool &state);
+    void setPatchingOldProj(const bool &state);
 
 signals:
     void loadFromFile(const QString &filePath);
@@ -35,7 +35,6 @@ private slots:
 private:
     void createActions();
     void createMenus();
-    void setDestructive(bool destructive);
 
     QStackedWidget *stackedWidget;
     menugui *menuWidget;
@@ -46,7 +45,7 @@ private:
     QAction *actionUploadOLM, *actionDownloadOLM;
     QAction *actionUploadEmu, *actionDownloadEmu;
     QAction *actionLink, *actionLinkAll;
-    QAction *actionSetRecSB, *actionPlayRecord, *actionPlayRecordTicker;
+    QAction *actionSetRecSB, *actionPlayRecord, *actionPlayRecordTicker, *actionPatchOldProj;
     QAction *actionChangeMenu, *actionSettings, *actionAbout;
 
 protected:

@@ -11,7 +11,7 @@ uint32_t findbdbase(uint32_t resource_list_base);
 int getnumhd(uint32_t hdbase);
 
 void pcsx2DwnlRecord(uint32_t record_addr, e_suggestrecord_t &editor_record);
-void pcsx2ParseComRecords();
+void pcsx2ParseComRecords(int scene_start, int scene_end);
 
 void pcsx2GetComBuffers();
 void pcxs2GetModelist(uint32_t stagemode_start, int count);

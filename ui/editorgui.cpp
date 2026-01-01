@@ -190,10 +190,17 @@ void editorgui::loadProject(QString tmpFileName)
     neodata::Log("Loading project from file: " + tmpFileName);
 
     int result = neodata::LoadFromBes(tmpFileName);
-    if(result == 0) {
+    if(result == 0 || result == 254) {
         hasEdited = false;
         afterProjLoad();
         drawEditorGUI();
+
+        if (result == 254) {
+            neodata::Log("Project file is a old BESMS project.");
+            QMessageBox::warning(this, "Old Project", "This is a old project. Although it loads, you need to use the 'Fix Old BESMS Project' option in tools for it to work as expected. Don't expect support for this file.");
+            emit setOldPatching(true);
+        }
+
         neodata::Log("Loaded project file successfully.");
     }
     else QMessageBox::critical(this, "Error on project load", strerror(result));
@@ -213,10 +220,17 @@ void editorgui::ALoadProject()
     neodata::Log("Loading project from file: " + tmpFileName);
 
     int result = neodata::LoadFromBes(tmpFileName);
-    if(result == 0) {
+    if(result == 0 || result == 254) {
         hasEdited = false;
         afterProjLoad();
         drawEditorGUI();
+
+        if (result == 254) {
+            neodata::Log("Project file is a old BESMS project.");
+            QMessageBox::warning(this, "Old Project", "This is a old project. Although it loads, you need to use the 'Fix Old BESMS Project' option in tools for it to work as expected. Don't expect support for this file.");
+            emit setOldPatching(true);
+        }
+
         neodata::Log("Loaded project file successfully.");
     }
     else QMessageBox::critical(this, "Error on project load", strerror(result));
@@ -385,7 +399,8 @@ void editorgui::setProjectWindowName() {
 
 void editorgui::afterProjLoad() {
     setProjectWindowName();
-    emit enableDestructive();
+    emit setDestructive(true);
+    emit setOldPatching(false);
     if(!isEditorActive) emit editorReady();
 
     CurrentRecord = 0;
@@ -552,14 +567,19 @@ void editorgui::drawEditorGUI() {
 
 bool once = false;
 void editorgui::setupCommandCB() {
+
+    QString commandListNames[27] = {"Cool", "Good", "Bad", "Awful", "Trans. to Cool", "Trans. from Cool", "Trans. to Better", "Trans. to Worse", "Game Over Scene", "Unknown"};
+    int commCount = 0;
+
     ui->comSelector->blockSignals(true);
     if(VSMode) {
 
     } else {
-        ui->comSelector->addItem("Cool", 0);
-        ui->comSelector->addItem("Good", 1);
-        ui->comSelector->addItem("Bad", 2);
-        ui->comSelector->addItem("Awful", 3);
+        for(int i = 0; i < ModeSize; i++) {
+            int commName = commCount > 9 ? 9 : commCount;
+            ui->comSelector->addItem(QString::number(commCount) + ": " + commandListNames[commName], commCount);
+            commCount++;
+        }
     }
     ui->comSelector->blockSignals(false);
 }
@@ -787,4 +807,27 @@ void editorgui::ASetSoundboard()
 
 void editorgui::APlayVariant(bool ticker) {
     audio->playVariant(Records[CurrentRecord].variants[MentionedVariant], Records[CurrentRecord].lengthinsubdots, StageInfo.bpm, ticker);
+}
+
+void editorgui::APatchOldProj() {
+    switch(neodata::FixBesmsProject())  {
+    case 0:
+        updateLog();
+        QMessageBox::information(this, "Patched Successfully", "The project file was patched successfully. You can now edit safely.");
+        emit setOldPatching(false);
+        drawEditorGUI();
+        break;
+    case 1:
+        QMessageBox::critical(this, "Error on patching", "PCSX2 wasn't found! Please verify that you're using PCSX2 with PINE enabled.");
+        break;
+    case 3:
+        QMessageBox::critical(this, "Error on patching", "This project is for another stage! Please verify compatibility and if is paused on the correct stage.");
+        break;
+    case 5:
+        QMessageBox::critical(this, "Error on patching", "This is not a compatible game. Please use a retail copy of PaRappa the Rapper 2 (US/JP/PAL).");
+        break;
+    default:
+        QMessageBox::critical(this, "Error on patching", "NeoBES caused an error while patching the project.");
+        break;
+    }
 }
