@@ -53,13 +53,11 @@ void menugui::setupRecentFiles() {
 
     ui->recentFilesView->setModel(model);
 
-    ui->recentFilesView->setEditTriggers(QAbstractItemView::NoEditTriggers); // Read only
-    ui->recentFilesView->setSortingEnabled(true);                           // Allow sorting by date
-    ui->recentFilesView->setAlternatingRowColors(true);                     // Better readability
-    ui->recentFilesView->setRootIsDecorated(false);                         // Removes tree arrows (flat list)
+    ui->recentFilesView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->recentFilesView->setAlternatingRowColors(true);
+    ui->recentFilesView->setRootIsDecorated(false);
 
     ui->recentFilesView->header()->setSectionResizeMode(0, QHeaderView::Stretch);
-    ui->recentFilesView->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
 }
 
 void menugui::onTreeViewClicked(const QModelIndex &index) {
