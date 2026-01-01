@@ -727,12 +727,12 @@ void editorgui::AButtonPaste() { // TODO: Check better solution for Paste
 
 void editorgui::ALineCreate() {
     hasEdited = true;
-    Records[CurrentRecord].variants[MentionedVariant].createLine((cursorpos * 24) + precpos, (cursorpos * 24) + precpos + 24, owners[cursorowner]);
+    Records[CurrentRecord].variants[MentionedVariant].createLine(cursorpos * 24, (cursorpos * 24) + 24, owners[cursorowner]);
 }
 
 void editorgui::ALineDelete() {
     hasEdited = true;
-    Records[CurrentRecord].variants[MentionedVariant].deleteLine((cursorpos * 24) + precpos, owners[cursorowner]);
+    Records[CurrentRecord].variants[MentionedVariant].deleteLine(cursorpos * 24, owners[cursorowner]);
 }
 
 void editorgui::ACommandCreate() {
