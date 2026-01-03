@@ -20,6 +20,7 @@ menugui::menugui(QWidget *parent)
     // Load Recent Files
     connect(ui->recentFilesView, &QTreeView::doubleClicked, this, &menugui::onTreeViewClicked);
 
+    model = new QStandardItemModel(0, 4, ui->recentFilesView);
     setupRecentFiles();
 }
 
@@ -33,9 +34,8 @@ menugui::~menugui()
 #include <QHeaderView>
 
 void menugui::setupRecentFiles() {
-    QStandardItemModel* model = new QStandardItemModel(0, 4, ui->recentFilesView);
+    model->clear();
     model->setHorizontalHeaderLabels({"Filename", "Stage", "Created", "Last Used"});
-
     QFileIconProvider iconProvider;
 
     for (const FileHistory &entry : SettingsManager::instance().getHistory()) {

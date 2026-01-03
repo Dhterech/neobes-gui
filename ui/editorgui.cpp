@@ -192,6 +192,7 @@ void editorgui::loadProject(QString tmpFileName)
     int result = neodata::LoadFromBes(tmpFileName);
     if(result == 0 || result == 254) {
         hasEdited = false;
+        emit updateMenuHistoryFile();
         afterProjLoad();
         drawEditorGUI();
 

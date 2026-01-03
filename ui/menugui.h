@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QWidget>
+#include <QStandardItemModel>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class menugui; }
@@ -16,6 +17,9 @@ public:
     explicit menugui(QWidget *parent = nullptr);
     ~menugui();
 
+public slots:
+    void setupRecentFiles();
+
 signals:
     // buttons
     void ADownloadEmu();
@@ -27,8 +31,8 @@ signals:
 
 private:
     Ui::menugui *ui;
-    void setupRecentFiles();
     void onTreeViewClicked(const QModelIndex &index);
+    QStandardItemModel* model;
 };
 
 #endif // MENUGUI_H
