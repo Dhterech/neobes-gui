@@ -210,32 +210,7 @@ void editorgui::loadProject(QString tmpFileName)
 
 void editorgui::ALoadProject()
 {
-    if(hasEdited) {
-        int wantsToGo = displaySaveDlg();
-        if(!wantsToGo) return;
-    }
-
-    QString tmpFileName = QFileDialog::getOpenFileName(this, tr("Open BES Project"), "", tr("Any File (*)"));
-    if(tmpFileName.isEmpty()) return;
-    neodata::Log("Loading project from file: " + tmpFileName);
-
-    int result = neodata::LoadFromBes(tmpFileName);
-    if(result == 0 || result == 254) {
-        hasEdited = false;
-        afterProjLoad();
-        drawEditorGUI();
-
-        if (result == 254) {
-            neodata::Log("Project file is a old BESMS project.");
-            QMessageBox::warning(this, "Old Project", "This is a old project. Although it loads, you need to use the 'Fix Old BESMS Project' option in tools for it to work as expected. Don't expect support for this file.");
-            emit setOldPatching(true);
-        }
-
-        neodata::Log("Loaded project file successfully.");
-    }
-    else QMessageBox::critical(this, "Error on project load", strerror(result));
-
-    updateLog();
+    loadProject(QFileDialog::getOpenFileName(this, tr("Open BES Project"), "", tr("Any File (*)")));
 }
 
 int editorgui::ASaveProject()
