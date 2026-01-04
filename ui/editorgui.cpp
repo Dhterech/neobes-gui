@@ -9,6 +9,7 @@
 #include <QCloseEvent>
 
 bool isEditorActive = false;
+bool oldProjectLimit = false;
 
 int cursorpos = 0;
 int cursorowner = 0;
@@ -198,8 +199,8 @@ void editorgui::loadProject(QString tmpFileName)
 
         if (result == 254) {
             neodata::Log("Project file is a old BESMS project.");
-            QMessageBox::warning(this, "Old Project", "This is a old project. Although it loads, you need to use the 'Fix Old BESMS Project' option in tools for it to work as expected. Don't expect support for this file.");
-            emit setOldPatching(true);
+            QMessageBox::warning(this, "Old Project", "This is a old project made in other besms tools that doesn't have all the data of the stage. This was responsible for errors or crashes where there wouldn't be in the original game.\n\nThe necessary data will be added if you use Upload to PCSX2. This won't affect other tools.");
+            oldProjectLimit = true;
         }
 
         neodata::Log("Loaded project file successfully.");
@@ -291,14 +292,6 @@ void editorgui::AUploadEmu()
 {
     neodata::Log("Uploading to PCSX2...");
 
-    int usedSize = neodata::CalcAvailableStorage();
-    int avaiSize = StageInfo.buttondataend - StageInfo.buttondatabase + 1;
-    if(usedSize > avaiSize) {
-        updateLog();
-        QMessageBox::information(this, "Error on upload", "The size of the project is bigger than the available space on the game's memory.");
-        return;
-    }
-
     switch(neodata::SaveToEmu()) {
     case 0:
         updateLog();
@@ -312,6 +305,9 @@ void editorgui::AUploadEmu()
         break;
     case 5:
         QMessageBox::critical(this, "Error on upload", "This is not a compatible game. Please use a retail copy of PaRappa the Rapper 2 (US/JP/PAL).");
+        break;
+    case 6:
+        QMessageBox::information(this, "Error on upload", "The size of the project is bigger than the available space on the game's memory.");
         break;
     default:
         QMessageBox::critical(this, "Error on upload", "NeoBES caused an error while uploading to PCSX2.");
@@ -376,7 +372,6 @@ void editorgui::setProjectWindowName() {
 void editorgui::afterProjLoad() {
     setProjectWindowName();
     emit setDestructive(true);
-    emit setOldPatching(false);
     if(!isEditorActive) emit editorReady();
 
     CurrentRecord = 0;
@@ -783,27 +778,4 @@ void editorgui::ASetSoundboard()
 
 void editorgui::APlayVariant(bool ticker) {
     audio->playVariant(Records[CurrentRecord].variants[MentionedVariant], Records[CurrentRecord].lengthinsubdots, StageInfo.bpm, ticker);
-}
-
-void editorgui::APatchOldProj() {
-    switch(neodata::FixBesmsProject())  {
-    case 0:
-        updateLog();
-        QMessageBox::information(this, "Patched Successfully", "The project file was patched successfully. You can now edit safely.");
-        emit setOldPatching(false);
-        drawEditorGUI();
-        break;
-    case 1:
-        QMessageBox::critical(this, "Error on patching", "PCSX2 wasn't found! Please verify that you're using PCSX2 with PINE enabled.");
-        break;
-    case 3:
-        QMessageBox::critical(this, "Error on patching", "This project is for another stage! Please verify compatibility and if is paused on the correct stage.");
-        break;
-    case 5:
-        QMessageBox::critical(this, "Error on patching", "This is not a compatible game. Please use a retail copy of PaRappa the Rapper 2 (US/JP/PAL).");
-        break;
-    default:
-        QMessageBox::critical(this, "Error on patching", "NeoBES caused an error while patching the project.");
-        break;
-    }
 }

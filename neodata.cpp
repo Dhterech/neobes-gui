@@ -86,15 +86,6 @@ FileHistory getFileHistory(QString tmpFileName, int stage) {
 /* Old Data Trickery */
 
 int neodata::FixBesmsProject() {
-    if(!pcsx2reader::IsEmuOpen()) return 1;
-
-    CurrentRegion = pcsx2reader::GetGameRegion();
-    if(CurrentRegion == 2 && SettingsManager::instance().bhvDebugJP()) CurrentRegion = 3;
-    if(CurrentRegion == -1) return 5;
-
-    uint32_t loadedStage = 0xFFFF;
-    pcsx2reader::read(CURRENT_STAGE[CurrentRegion], &loadedStage, 4);
-    if(loadedStage != CurrentStage + 1) return 3;
     ImportStageInfo();
 
     neodata::Log(" Status: Initiating old BESMS project fix...");
@@ -312,12 +303,20 @@ int neodata::SaveToEmu() {
     uint32_t loadedStage = 0xFFFF;
     pcsx2reader::read(CURRENT_STAGE[CurrentRegion], &loadedStage, 4);
     if(loadedStage != CurrentStage + 1) return 3;
-    ImportStageInfo();
-
-    // Project File doesn't have modes in it. If it's zeroed out, get from the running emulator
-    if(Modes.size() == 0) pcxs2GetModelist(StageInfo.stagemodelistbase, ModeSize);
 
     try {
+        // Automatically apply fix for older project files
+        if(Modes.size() != stages[CurrentStage].modescenes) {
+            neodata::FixBesmsProject();
+        }
+
+        ImportStageInfo();
+
+        if(CalcAvailableStorage() > StageInfo.buttondataend - StageInfo.buttondatabase + 1) return 6;
+
+        // Project File doesn't have modes in it. If it's zeroed out, get from the running emulator
+        if(Modes.size() == 0) pcxs2GetModelist(StageInfo.stagemodelistbase, ModeSize);
+
         bool result = pcsx2upload(Records, Modes, ModeCommands, StageInfo, VSMode, PALMode, SUBMode, OopsSize, ModeSize);
         if(result == false) return 4;
     } catch(...) { return 2; }

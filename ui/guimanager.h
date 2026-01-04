@@ -21,7 +21,6 @@ public slots:
     void handleEditorReady();
     void handleSetWindowName(const QString &title);
     void setDestructiveActions(const bool &state);
-    void setPatchingOldProj(const bool &state);
 
 signals:
     void loadFromFile(const QString &filePath);
