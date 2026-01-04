@@ -219,13 +219,13 @@ int neodata::LoadFromBes(QString fileName) {
     rawFile.open(fileName.toUtf8(), std::ios_base::in | std::ios_base::binary);
     if(!rawFile.is_open()) return errno;
 
-    ProjectInfo = getFileHistory(fileName, CurrentStage);
-    SettingsManager::instance().addFileToHistory(ProjectInfo);
-
     CloseProject();
 
     READ(tmpu32); CurrentStage = tmpu32;
     ImportStageInfo();
+
+    ProjectInfo = getFileHistory(fileName, CurrentStage);
+    SettingsManager::instance().addFileToHistory(ProjectInfo);
 
     for(int i = 0; i < 9; i++) loadSceneCommands();
 
