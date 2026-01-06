@@ -548,7 +548,10 @@ void editorgui::setupCommandCB() {
 
     ui->comSelector->blockSignals(true);
     if(VSMode) {
-
+        for(int i = 0; i < ModeSize; i++) {
+            ui->comSelector->addItem(QString::number(commCount) + ": " + commandListNames[9], commCount);
+            commCount++;
+        }
     } else {
         for(int i = 0; i < ModeSize; i++) {
             int commName = commCount > 9 ? 9 : commCount;
