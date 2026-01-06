@@ -543,13 +543,15 @@ void editorgui::drawEditorGUI() {
 bool once = false;
 void editorgui::setupCommandCB() {
 
-    QString commandListNames[27] = {"Cool", "Good", "Bad", "Awful", "Trans. to Cool", "Trans. from Cool", "Trans. to Better", "Trans. to Worse", "Game Over Scene", "Unknown"};
+    const QString commandListNames[27] = {"Cool", "Good", "Bad", "Awful", "Trans. to Cool", "Trans. from Cool", "Trans. to Better", "Trans. to Worse", "Game Over Scene", "Unknown"};
+    const QString commandListNamesVS[42] = {"Unk", "Starting Scene", "Round 1", "Round 2", "Round 3", "Round 4", "Round 5", "Draw Scene"};
     int commCount = 0;
 
     ui->comSelector->blockSignals(true);
     if(VSMode) {
         for(int i = 0; i < ModeSize; i++) {
-            ui->comSelector->addItem(QString::number(commCount) + ": " + commandListNames[9], commCount);
+            int commName = commCount > 6 ? 6 : commCount;
+            ui->comSelector->addItem(QString::number(commCount) + ": " + commandListNamesVS[commName], commCount);
             commCount++;
         }
     } else {
