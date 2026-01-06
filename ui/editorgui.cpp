@@ -57,7 +57,7 @@ int MentionedVariant;
 int SelectedLine;
 bool hasEdited;
 
-suggestbutton_t *copiedButton;
+suggestbutton_t copiedButton;
 
 AudioPlayer *audio;
 
@@ -681,7 +681,7 @@ void editorgui::handleButtonKeys(int buttonId) {
 // TODO: Expose variables for managing with cursor?
 void editorgui::AButtonCopy() {
     suggestbutton_t *button = Records[CurrentRecord].variants[MentionedVariant].getButtonRefFromSubdot(owners[cursorowner], (cursorpos * 24) + precpos);
-    if(button) copiedButton = button;
+    if(button) copiedButton = *button;
 }
 
 void editorgui::AButtonCut() {
@@ -696,11 +696,11 @@ void editorgui::AButtonDelete() {
 
 void editorgui::AButtonPaste() {
     AButtonDelete();
-    Records[CurrentRecord].variants[MentionedVariant].createButton((cursorpos * 24) + precpos, owners[cursorowner], copiedButton->buttonid);
+    Records[CurrentRecord].variants[MentionedVariant].createButton((cursorpos * 24) + precpos, owners[cursorowner], copiedButton.buttonid);
 
     suggestbutton_t *pbutton = Records[CurrentRecord].variants[MentionedVariant].getButtonRefFromSubdot(owners[cursorowner], (cursorpos * 24) + precpos);
     if(pbutton) {
-        for(int s = 0; s < 4; s++) pbutton->sounds[s] = copiedButton->sounds[s];
+        for(int s = 0; s < 4; s++) pbutton->sounds[s] = copiedButton.sounds[s];
     }
 }
 
