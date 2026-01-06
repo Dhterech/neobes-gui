@@ -786,18 +786,18 @@ void editorgui::APlayVariant(bool ticker) {
 /* Line Resize */
 
 void editorgui::ALineLeftExpand(uint32_t subdot, PLAYER_CODE owner) {
-    Records[CurrentRecord].variants[CurrentVariant].resizeLine(subdot, owner, true, EditMode::Expand);
+    Records[CurrentRecord].variants[CurrentVariant].resizeMoveLine(subdot, owner, true, false);
 }
 
 void editorgui::ALineRightExpand(uint32_t subdot, PLAYER_CODE owner) {
-    Records[CurrentRecord].variants[CurrentVariant].resizeLine(subdot, owner, false, EditMode::Expand);
+    Records[CurrentRecord].variants[CurrentVariant].resizeMoveLine(subdot, owner, false, false);
 }
 
 void editorgui::ALineMoveLeftLine(uint32_t subdot, PLAYER_CODE owner) {
-    Records[CurrentRecord].variants[CurrentVariant].resizeLine(subdot, owner, true, EditMode::Move);
+    Records[CurrentRecord].variants[CurrentVariant].resizeMoveLine(subdot, owner, true, true);
 }
 
 void editorgui::ALineMoveRightLine(uint32_t subdot, PLAYER_CODE owner) {
-    Records[CurrentRecord].variants[CurrentVariant].resizeLine(subdot, owner, false, EditMode::Move);
+    Records[CurrentRecord].variants[CurrentVariant].resizeMoveLine(subdot, owner, false, true);
 }
 

@@ -93,7 +93,7 @@ struct e_suggestvariant_t { // different
     void deleteButton(uint32_t subdot, PLAYER_CODE owner);
     void createLine(uint32_t subdot_start, uint32_t subdot_end, PLAYER_CODE owner);
     void deleteLine(int subdot, PLAYER_CODE owner);
-    void resizeLine(uint32_t subdot, PLAYER_CODE owner, bool searchLeft, EditMode mode);
+    void resizeMoveLine(uint32_t subdot, PLAYER_CODE owner, bool searchLeft, bool moveLine);
     int setLink(int linkId);
 
     e_suggestline_t* getLineRefFromSubdot(PLAYER_CODE owner, uint32_t subdot);

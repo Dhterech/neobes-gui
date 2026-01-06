@@ -120,13 +120,11 @@ void e_suggestvariant_t::deleteLine(int subdot, PLAYER_CODE owner) {
     }
 }
 
-// resizing
-
-void e_suggestvariant_t::resizeLine(uint32_t subdot, PLAYER_CODE owner, bool searchLeft, EditMode mode) {
+void e_suggestvariant_t::resizeMoveLine(uint32_t subdot, PLAYER_CODE owner, bool searchLeft, bool moveLine) {
     e_suggestline_t *pline = nullptr;
 
     if (searchLeft) {
-        // Find closest line starting BEFORE subdot
+        // Left: Find closest line starting BEFORE subdot
         for (auto &line : this->lines) {
             if (!has_player(line.owner, owner)) continue;
             if (line.timestamp_start < subdot) {
@@ -136,7 +134,7 @@ void e_suggestvariant_t::resizeLine(uint32_t subdot, PLAYER_CODE owner, bool sea
             }
         }
     } else {
-        // Try to find line containing subdot; if not, find closest starting AFTER subdot
+        // Right: Try to find line containing subdot, if not, find closest starting AFTER subdot
         pline = this->getLineRefFromSubdot(owner, subdot);
         if (pline == nullptr) {
             for (auto &line : this->lines) {
@@ -153,7 +151,7 @@ void e_suggestvariant_t::resizeLine(uint32_t subdot, PLAYER_CODE owner, bool sea
     if (!pline) return;
     e_suggestline_t &line = *pline;
 
-    if (mode == EditMode::Move) { // Drag line
+    if (moveLine) {
         int delta = (int)subdot - (int)line.timestamp_start;
         line.timestamp_start = subdot;
         line.timestamp_end += delta;
