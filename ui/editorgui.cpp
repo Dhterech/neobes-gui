@@ -331,7 +331,7 @@ void editorgui::ADownloadOLM()
     int size = QInputDialog::getInt(this, tr("Type the OLM file size"), tr("Type file size"), 0, 0, 52428800, 1, &userConfirmation);
     if(!userConfirmation) return; // User Cancel 2
 
-    switch(neodata::DownloadOLMFromEmu(fileName, size)) {
+    switch(neodata::DownloadOLMFromEmu(tmpFileName, size)) {
     case 1:
         QMessageBox::critical(this, "Error on download", "NeoBES caused an error while downloading to PCSX2.");
         break;
@@ -346,10 +346,10 @@ void editorgui::ADownloadOLM()
 
 void editorgui::AUploadOLM()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Load OLM to Upload"), "", tr("Overlay Module (*.OLM)"));
-    if(fileName.isEmpty()) return; // User Cancel
+    QString tmpFileName = QFileDialog::getOpenFileName(this, tr("Load OLM to Upload"), "", tr("Overlay Module (*.OLM)"));
+    if(tmpFileName.isEmpty()) return; // User Cancel
 
-    switch(neodata::UploadOLMToEmu(fileName)) {
+    switch(neodata::UploadOLMToEmu(tmpFileName)) {
     case false:
         QMessageBox::critical(this, "Error on upload", "NeoBES caused an error while uploading to PCSX2.");
         break;
