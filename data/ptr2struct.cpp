@@ -95,7 +95,7 @@ bool lineSorter(e_suggestline_t &line1, e_suggestline_t &line2) { return (line1.
 
 void e_suggestvariant_t::createLine(uint32_t subdot_start, uint32_t subdot_end, PLAYER_CODE owner) {
     e_suggestline_t *line = this->getLineRefFromSubdot(owner, subdot_start);
-    if(line == nullptr) return;
+    if(line != nullptr) return;
 
     e_suggestline_t newline;
     newline.owner = owner;
