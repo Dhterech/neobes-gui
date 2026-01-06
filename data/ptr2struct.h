@@ -81,6 +81,9 @@ struct e_suggestline_t {
     bool containssubdot(uint32_t subdot);
 };
 
+
+enum class EditMode { Expand, Move };
+
 struct e_suggestvariant_t { // different
     bool islinked = false;
     int linknum;
@@ -90,11 +93,11 @@ struct e_suggestvariant_t { // different
     void deleteButton(uint32_t subdot, PLAYER_CODE owner);
     void createLine(uint32_t subdot_start, uint32_t subdot_end, PLAYER_CODE owner);
     void deleteLine(int subdot, PLAYER_CODE owner);
+    void resizeLine(uint32_t subdot, PLAYER_CODE owner, bool searchLeft, EditMode mode);
     int setLink(int linkId);
 
-    bool getLineRefFromSubdot(PLAYER_CODE owner, uint32_t subdot, e_suggestline_t **line);
-    bool getButFromSubdot(PLAYER_CODE owner, uint32_t subdot, suggestbutton_t &button);
-    bool getButRefFromSubdot(PLAYER_CODE owner, uint32_t subdot, suggestbutton_t **button);
+    e_suggestline_t* getLineRefFromSubdot(PLAYER_CODE owner, uint32_t subdot);
+    suggestbutton_t* getButtonRefFromSubdot(PLAYER_CODE owner, uint32_t subdot);
     bool isDotOwned(int dot, PLAYER_CODE owner);
 };
 

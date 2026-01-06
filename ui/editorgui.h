@@ -61,6 +61,10 @@ private slots:
     void AButtonPaste();
     void ALineCreate();
     void ALineDelete();
+    void ALineLeftExpand(uint32_t subdot, PLAYER_CODE owner);
+    void ALineRightExpand(uint32_t subdot, PLAYER_CODE owner);
+    void ALineMoveLeftLine(uint32_t subdot, PLAYER_CODE owner);
+    void ALineMoveRightLine(uint32_t subdot, PLAYER_CODE owner);
 
     void ACommandCreate();
     void ACommandDelete();

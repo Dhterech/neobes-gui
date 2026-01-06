@@ -57,7 +57,7 @@ int MentionedVariant;
 int SelectedLine;
 bool hasEdited;
 
-suggestbutton_t copiedButton;
+suggestbutton_t *copiedButton;
 
 AudioPlayer *audio;
 
@@ -170,6 +170,11 @@ void editorgui::keyPressEvent(QKeyEvent *event)
         /* Managing Lines */
         case Qt::Key_Space: ALineCreate(); break;
         case Qt::Key_Backspace: ALineDelete(); break;
+        case Qt::Key_Comma: ALineLeftExpand(cursorpos * 24, owners[cursorowner]); break;
+        case Qt::Key_Period: ALineRightExpand(cursorpos * 24, owners[cursorowner]); break;
+        case Qt::Key_N: ALineMoveLeftLine(cursorpos * 24, owners[cursorowner]); break;
+        case Qt::Key_M: ALineMoveRightLine(cursorpos * 24, owners[cursorowner]); break;
+
         /* Don't draw when not needed */
         default: return;
         }
@@ -382,15 +387,15 @@ QString drawLine(int start, int end, int interval, PLAYER_CODE owner, int skip, 
     e_suggestvariant_t &variant = Records[CurrentRecord].variants[MentionedVariant];
     QString iconStart = "<img src=\"%1\" width=" + QString::number(SettingsManager::instance().hudIconSize()) + ">";
     QString cursor = "<b style=\"background-color: " + accentColor + "\">%1</b>";
-    suggestbutton_t button;
     QString out;
 
     for (int dot = start; dot < end; dot += interval) {
         QString drawnIcon = "";
 
         for(int subcount = 0; subcount < interval; subcount++) {
-            if(!variant.getButFromSubdot(owner, dot + subcount, button)) continue;
-            drawnIcon = iconStart.arg(buttonsUIRes[button.buttonid]);
+            if(suggestbutton_t *button = variant.getButtonRefFromSubdot(owner, dot + subcount)) {
+                drawnIcon = iconStart.arg(buttonsUIRes[button->buttonid]);
+            }
         }
 
         if(drawnIcon.isEmpty()) {
@@ -420,15 +425,15 @@ QString drawRecord(PLAYER_CODE owner, int start, int length, int interval, int c
 }
 
 void editorgui::drawButtonProperties() {
-    suggestbutton_t button;
+    suggestbutton_t *button = Records[CurrentRecord].variants[MentionedVariant].getButtonRefFromSubdot(owners[cursorowner], (cursorpos * 24) + precpos);
     ui->butProperty->blockSignals(true);
-    if(Records[CurrentRecord].variants[MentionedVariant].getButFromSubdot(owners[cursorowner], (cursorpos * 24) + precpos, button)) {
+    if(button) {
         ui->butProperty->setEnabled(true);
 
         for(int i = 0; i < 4; i++) {
-            QTableWidgetItem *sdid = new QTableWidgetItem(QString::number((int16_t)button.sounds[i].soundid));
-            QTableWidgetItem *anim = new QTableWidgetItem(QString::number((int16_t)button.sounds[i].animationid));
-            QTableWidgetItem *time = new QTableWidgetItem(QString::number((int32_t)button.sounds[i].relativetime));
+            QTableWidgetItem *sdid = new QTableWidgetItem(QString::number((int16_t)button->sounds[i].soundid));
+            QTableWidgetItem *anim = new QTableWidgetItem(QString::number((int16_t)button->sounds[i].animationid));
+            QTableWidgetItem *time = new QTableWidgetItem(QString::number((int32_t)button->sounds[i].relativetime));
 
             ui->butProperty->setItem(i,0,sdid);
             ui->butProperty->setItem(i,1,anim);
@@ -441,8 +446,7 @@ void editorgui::drawButtonProperties() {
 }
 
 void editorgui::updateButtonProperties(int row, int column) {
-    suggestbutton_t *button;
-    Records[CurrentRecord].variants[MentionedVariant].getButRefFromSubdot(owners[cursorowner], (cursorpos * 24) + precpos, &button);
+    suggestbutton_t *button = Records[CurrentRecord].variants[MentionedVariant].getButtonRefFromSubdot(owners[cursorowner], (cursorpos * 24) + precpos);
     QString valueChanged = ui->butProperty->item(row, column)->text();
 
     if (column == 0) { // Sound
@@ -671,8 +675,8 @@ void editorgui::handleButtonKeys(int buttonId) {
 
 // TODO: Expose variables for managing with cursor?
 void editorgui::AButtonCopy() {
-    suggestbutton_t button; // TODO: Test done without copying it
-    if(Records[CurrentRecord].variants[MentionedVariant].getButFromSubdot(owners[cursorowner], (cursorpos * 24) + precpos, button)) copiedButton = button;
+    suggestbutton_t *button = Records[CurrentRecord].variants[MentionedVariant].getButtonRefFromSubdot(owners[cursorowner], (cursorpos * 24) + precpos);
+    if(button) copiedButton = button;
 }
 
 void editorgui::AButtonCut() {
@@ -685,14 +689,13 @@ void editorgui::AButtonDelete() {
     Records[CurrentRecord].variants[MentionedVariant].deleteButton((cursorpos * 24) + precpos, owners[cursorowner]);
 }
 
-void editorgui::AButtonPaste() { // TODO: Check better solution for Paste
-    suggestbutton_t *pbutton;
-
+void editorgui::AButtonPaste() {
     AButtonDelete();
-    Records[CurrentRecord].variants[MentionedVariant].createButton((cursorpos * 24) + precpos, owners[cursorowner], copiedButton.buttonid);
+    Records[CurrentRecord].variants[MentionedVariant].createButton((cursorpos * 24) + precpos, owners[cursorowner], copiedButton->buttonid);
 
-    if(Records[CurrentRecord].variants[MentionedVariant].getButRefFromSubdot(owners[cursorowner], (cursorpos * 24) + precpos, &pbutton)) {
-        for(int s = 0; s < 4; s++) pbutton->sounds[s] = copiedButton.sounds[s];
+    suggestbutton_t *pbutton = Records[CurrentRecord].variants[MentionedVariant].getButtonRefFromSubdot(owners[cursorowner], (cursorpos * 24) + precpos);
+    if(pbutton) {
+        for(int s = 0; s < 4; s++) pbutton->sounds[s] = copiedButton->sounds[s];
     }
 }
 
@@ -779,3 +782,22 @@ void editorgui::ASetSoundboard()
 void editorgui::APlayVariant(bool ticker) {
     audio->playVariant(Records[CurrentRecord].variants[MentionedVariant], Records[CurrentRecord].lengthinsubdots, StageInfo.bpm, ticker);
 }
+
+/* Line Resize */
+
+void editorgui::ALineLeftExpand(uint32_t subdot, PLAYER_CODE owner) {
+    Records[CurrentRecord].variants[CurrentVariant].resizeLine(subdot, owner, true, EditMode::Expand);
+}
+
+void editorgui::ALineRightExpand(uint32_t subdot, PLAYER_CODE owner) {
+    Records[CurrentRecord].variants[CurrentVariant].resizeLine(subdot, owner, false, EditMode::Expand);
+}
+
+void editorgui::ALineMoveLeftLine(uint32_t subdot, PLAYER_CODE owner) {
+    Records[CurrentRecord].variants[CurrentVariant].resizeLine(subdot, owner, true, EditMode::Move);
+}
+
+void editorgui::ALineMoveRightLine(uint32_t subdot, PLAYER_CODE owner) {
+    Records[CurrentRecord].variants[CurrentVariant].resizeLine(subdot, owner, false, EditMode::Move);
+}
+
