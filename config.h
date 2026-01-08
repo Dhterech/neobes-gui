@@ -91,7 +91,7 @@ public:
     }
 
     void clearHistory() {
-        m_settings->remove("recentFiles");
+        m_recFiles->remove("recentFiles");
 
         emit historyChanged();
     }
