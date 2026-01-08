@@ -41,6 +41,7 @@ guimanager::guimanager(QWidget *parent) : QMainWindow(parent) {
     connect(editorWidget, &editorgui::editorReady, this, &guimanager::handleEditorReady);
     connect(editorWidget, &editorgui::setWindowName, this, &guimanager::handleSetWindowName);
     connect(editorWidget, &editorgui::setDestructive, this, &guimanager::setDestructiveActions);
+    connect(editorWidget, &editorgui::setPlayingAudio, this, &guimanager::handleSetAudioPlayback);
     connect(this, &guimanager::loadFromFile, editorWidget, &editorgui::loadProject);
 
     // Editor Oriented Actions
@@ -198,6 +199,18 @@ void guimanager::handleEditorReady() {
 
 void guimanager::handleSetWindowName(const QString &title) {
     this->setWindowTitle(title);
+}
+
+void guimanager::handleSetAudioPlayback(const bool &state) {
+    actionPlayRecordTicker->setText(state ? "Stop Audio &Playback" : "&Play Record");
+    actionPlayRecordTicker->setIcon(QIcon::fromTheme(state ? QIcon::ThemeIcon::MediaPlaybackStop : QIcon::ThemeIcon::MediaPlaybackStart));
+    actionPlayRecord->setEnabled(!state);
+
+    if(state) {
+        statusBar()->showMessage("Playing audio from a variant. Press 'P' to stop.");
+    } else {
+        statusBar()->clearMessage();
+    }
 }
 
 /* Drag and Drop */

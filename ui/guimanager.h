@@ -20,6 +20,7 @@ public:
 public slots:
     void handleEditorReady();
     void handleSetWindowName(const QString &title);
+    void handleSetAudioPlayback(const bool &state);
     void setDestructiveActions(const bool &state);
 
 signals:

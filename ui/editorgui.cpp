@@ -9,6 +9,7 @@
 #include <QCloseEvent>
 
 bool isEditorActive = false;
+bool isAudioPlaying = false;
 bool oldProjectLimit = false;
 
 int cursorpos = 0;
@@ -71,6 +72,7 @@ editorgui::editorgui(QWidget *parent)
     pcsx2reader::SetupIPC();
 
     this->setFocusPolicy(Qt::StrongFocus);
+    this->setAttribute(Qt::WA_AlwaysShowToolTips, true);
     ui->variantInput->setMaximum(16);
 
     connect(ui->recordInput, QOverload<int>::of(&QSpinBox::valueChanged), this, [=, this]() {
@@ -94,6 +96,7 @@ editorgui::editorgui(QWidget *parent)
     /* Init audio */
     audio = new AudioPlayer();
     audio->initialize();
+    connect(audio, &AudioPlayer::signStopPlayback, this, &editorgui::APlaybackStop);
 
     // Setup accent color
     accentColor = QApplication::palette().color(QPalette::Highlight).name();
@@ -785,7 +788,18 @@ void editorgui::ASetSoundboard()
 }
 
 void editorgui::APlayVariant(bool ticker) {
-    audio->playVariant(Records[CurrentRecord].variants[MentionedVariant], Records[CurrentRecord].lengthinsubdots, StageInfo.bpm, ticker);
+    if(isAudioPlaying) {
+        audio->stopPlayback();
+    } else {
+        audio->playVariant(Records[CurrentRecord].variants[MentionedVariant], Records[CurrentRecord].lengthinsubdots, StageInfo.bpm, ticker);
+        isAudioPlaying = true;
+        emit setPlayingAudio(true);
+    }
+}
+
+void editorgui::APlaybackStop() {
+    isAudioPlaying = false;
+    emit setPlayingAudio(false);
 }
 
 /* Line Resize */
@@ -805,4 +819,3 @@ void editorgui::ALineMoveLeftLine(uint32_t subdot, PLAYER_CODE owner) {
 void editorgui::ALineMoveRightLine(uint32_t subdot, PLAYER_CODE owner) {
     Records[CurrentRecord].variants[CurrentVariant].resizeMoveLine(subdot, owner, false, true);
 }
-

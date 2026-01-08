@@ -64,13 +64,15 @@ public:
         timer->start(16); // Update every ~16 ms (for ~60 FPS)
     }
 
-protected:
-    // Override key press event to stop playback
-    void keyPressEvent(QKeyEvent *event) override {
+    void stopPlayback() {
         timer->stop();
         soundenv.stopAll();
-        this->close();
+        emit signStopPlayback();
+        //this->close();
     }
+
+signals:
+    void signStopPlayback();
 
 private slots:
     // Play the next sound based on the current time and the tokens
@@ -93,6 +95,7 @@ private slots:
         if (rtime >= lineEnd) {
             timer->stop();
             soundenv.stopAll();
+            emit signStopPlayback();
         }
     }
 

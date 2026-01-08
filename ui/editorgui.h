@@ -29,6 +29,7 @@ signals:
     void editorReady();
     void setWindowName(const QString &title);
     void setDestructive(const bool &state);
+    void setPlayingAudio(const bool &state);
     void updateMenuHistoryFile();
 
 public slots:
@@ -47,6 +48,7 @@ public slots:
     void ALinkVariant(bool linkAll);
     void ASetSoundboard();
     void APlayVariant(bool ticker);
+    void APlaybackStop();
 
 private slots:
     // Internal
