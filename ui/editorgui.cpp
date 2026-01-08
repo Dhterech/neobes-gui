@@ -379,6 +379,7 @@ void editorgui::setProjectWindowName() {
 
 void editorgui::afterProjLoad() {
     setProjectWindowName();
+    setupCommandCB();
     emit setDestructive(true);
     if(!isEditorActive) emit editorReady();
 
@@ -543,17 +544,16 @@ void editorgui::drawEditorGUI() {
 
 #include "job.h"
 
-bool once = false;
 void editorgui::setupCommandCB() {
-
     const QString commandListNames[27] = {"Cool", "Good", "Bad", "Awful", "Trans. to Cool", "Trans. from Cool", "Trans. to Better", "Trans. to Worse", "Game Over Scene", "Unknown"};
-    const QString commandListNamesVS[42] = {"Unk", "Starting Scene", "Round 1", "Round 2", "Round 3", "Round 4", "Round 5", "Draw Scene"};
+    const QString commandListNamesVS[42] = {"Unknown", "Starting Scene", "Round 1", "Round 2", "Round 3", "Round 4", "Round 5", "Unknown"};
     int commCount = 0;
 
     ui->comSelector->blockSignals(true);
+    ui->comSelector->clear();
     if(VSMode) {
         for(int i = 0; i < ModeSize; i++) {
-            int commName = commCount > 6 ? 6 : commCount;
+            int commName = commCount > 7 ? 7 : commCount;
             ui->comSelector->addItem(QString::number(commCount) + ": " + commandListNamesVS[commName], commCount);
             commCount++;
         }
@@ -567,8 +567,7 @@ void editorgui::setupCommandCB() {
     ui->comSelector->blockSignals(false);
 }
 
-void editorgui::drawCommands() { // NOTE TO JOO: I left it as it is due to extreme delay when loading :)
-    if(!once) {setupCommandCB(); once = true;}
+void editorgui::drawCommands() {
     int currentCommandSelect = ui->comSelector->currentIndex();
     int curRow = 0;
 
