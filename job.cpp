@@ -83,18 +83,52 @@ static int findStringIndex(const QString& target, const QString array[], int siz
     return -1; // Not found
 }
 
-void intcommand::handleSceneCommand(GUICommand &gui, int rank, int time) {
+void intcommand::handleSceneGotoCommand(GUICommand &gui, int rank, int time) {
     if (rank >= 0 && rank < std::size(modesSingleP)) {
-        gui.arg1 = "Rank: " + modesSingleP[rank];
+        gui.arg1 = "Goto: " + modesSingleP[rank];
     } else {
-        gui.arg1 = "Rank: " + QString::number(rank);
+        gui.arg1 = "Goto: " + QString::number(rank);
     }
-    gui.arg4 = "Time: " + QString::number(time);
+    gui.arg4 = "At: " + QString::number(time);
 }
 
-void intcommand::reverseHandleSceneCommand(GUICommand &gui, uint16_t &rank, uint32_t &time) {
-    const QString rankPrefix = "Rank: ";
-    const QString timePrefix = "Time: ";
+void intcommand::handleSceneTransCommand(GUICommand &gui, int rank, int time) {
+    if (rank >= 0 && rank < std::size(modesSingleP)) {
+        gui.arg1 = "Transition: " + modesSingleP[rank];
+    } else {
+        gui.arg1 = "Transition: " + QString::number(rank);
+    }
+    gui.arg4 = "Duration: " + QString::number(time);
+}
+
+
+void intcommand::reverseHandleSceneGotoCommand(GUICommand &gui, uint16_t &rank, uint32_t &time) {
+    const QString rankPrefix = "Goto: ";
+    const QString timePrefix = "At: ";
+
+    if (gui.arg1.startsWith(rankPrefix)) {
+        QString rankTmp = gui.arg1.mid(rankPrefix.length());
+        int index = findStringIndex(rankTmp, modesSingleP, std::size(modesSingleP));
+
+        if (index != -1) {
+            rank = index;
+        } else {
+            rank = rankTmp.toInt();
+        }
+    } else {
+        rank = gui.arg1.toInt();
+    }
+
+    if (gui.arg4.startsWith(timePrefix)) {
+        time = gui.arg4.mid(timePrefix.length()).toInt();
+    } else {
+        time = gui.arg4.toInt();
+    }
+}
+
+void intcommand::reverseHandleSceneTransCommand(GUICommand &gui, uint16_t &rank, uint32_t &time) {
+    const QString rankPrefix = "Transition: ";
+    const QString timePrefix = "Duration: ";
 
     if (gui.arg1.startsWith(rankPrefix)) {
         QString rankTmp = gui.arg1.mid(rankPrefix.length());
@@ -200,10 +234,13 @@ GUICommand intcommand::ConvertToGUI(commandbuffer_t command) {
             break;
 
         case 0x03: // SCRRJ_UP_LINE
-        case 0x04: // SCRRJ_UP_JOB
         case 0x05: // SCRRJ_DOWN_LINE
+            handleSceneGotoCommand(gui, command.arg1, command.arg4);
+        break;
+
+        case 0x04: // SCRRJ_UP_JOB
         case 0x06: // SCRRJ_DOWN_JOB
-            handleSceneCommand(gui, command.arg1, command.arg4);
+            handleSceneTransCommand(gui, command.arg1, command.arg4);
             break;
 
         case 0x07: // SCRRJ_ENDJOB
@@ -247,9 +284,8 @@ GUICommand intcommand::ConvertToGUI(commandbuffer_t command) {
                     if (command.arg2 >= 0 && command.arg2 < std::size(subjob_displaylr)) {
                         gui.arg2 = subjob_displaylr[command.arg2];
                     }
-                    gui.arg3 = "Time: " + QString::number(command.arg3);
-                    break;
-                case 0x14: // SCRSUBJ_CDSND_READY
+                    gui.arg3 = "At: " + QString::number(command.arg3);
+                    break;                case 0x14: // SCRSUBJ_CDSND_READY
                     gui.arg2 = "File Index: " + QString::number(command.arg2);
                     break;
                 case 0x15: // SCRSUBJ_CDSND_REQ

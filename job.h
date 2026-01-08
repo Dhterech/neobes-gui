@@ -16,8 +16,10 @@ struct GUICommand {
 class intcommand
 {
 private:
-    static void handleSceneCommand(GUICommand &gui, int rank, int time);
-    static void reverseHandleSceneCommand(GUICommand &gui, uint16_t &rank, uint32_t &time);
+    static void handleSceneGotoCommand(GUICommand &gui, int rank, int time);
+    static void handleSceneTransCommand(GUICommand &gui, int rank, int time);
+    static void reverseHandleSceneGotoCommand(GUICommand &gui, uint16_t &rank, uint32_t &time);
+    static void reverseHandleSceneTransCommand(GUICommand &gui, uint16_t &rank, uint32_t &time);
     static QString handleRecord(int pointer);
     static uint32_t reverseHandleRecord(QString argument);
     static QString handleOwners(uint32_t owner);
