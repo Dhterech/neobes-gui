@@ -529,7 +529,7 @@ void editorgui::drawEditorGUI() {
     updateLog();
 
     for(int curOwner = 0; curOwner < numowners; curOwner++) {
-        textGUI += "<h2>" + getOwnerName(owners[curOwner]) + "</h2>";
+        textGUI += "<h2>" + getOwnerName(owners[curOwner]) + "</h2><br>";
         textGUI += "" + drawRecord(owners[curOwner], 0, Records[CurrentRecord].lengthinsubdots, 24, curOwner == cursorowner ? cursorpos : -1) + "<br>";
     }
     if(SettingsManager::instance().hudCenterVisual()) textGUI = QString("<center>%1</center><br>").arg(textGUI);
