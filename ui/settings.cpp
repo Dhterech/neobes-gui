@@ -15,6 +15,8 @@ Settings::Settings(QWidget *parent)
     connect(ui->btnClearHistory, &QPushButton::clicked, this, &Settings::onClearHistory);
 
     connect(&SettingsManager::instance(), &SettingsManager::historyChanged, this, &Settings::refreshHistory);
+
+    ui->tabWidget->setCurrentIndex(0);
 }
 
 Settings::~Settings()
