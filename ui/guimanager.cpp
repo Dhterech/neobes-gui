@@ -7,6 +7,8 @@
 #include <qdir.h>
 #include <qmimedata.h>
 
+bool isEdited = false;
+
 guimanager::guimanager(QWidget *parent) : QMainWindow(parent) {
     setWindowTitle("NeoBES");
     setWindowIcon(QIcon(":/res/neobes.ico"));
@@ -22,6 +24,8 @@ guimanager::guimanager(QWidget *parent) : QMainWindow(parent) {
     setStatusBar(new QStatusBar(this));
     createActions();
     createMenus();
+
+    connect(actionExit, &QAction::triggered, this, &guimanager::close);
 
     // Other Windows Actions
     connect(actionAbout, &QAction::triggered, this, &guimanager::AAboutGUI);
@@ -39,6 +43,7 @@ guimanager::guimanager(QWidget *parent) : QMainWindow(parent) {
 
     // Editor Signals
     connect(editorWidget, &editorgui::editorReady, this, &guimanager::handleEditorReady);
+    connect(editorWidget, &editorgui::setEdited, this, &guimanager::handleSetEdited);
     connect(editorWidget, &editorgui::setWindowName, this, &guimanager::handleSetWindowName);
     connect(editorWidget, &editorgui::setDestructive, this, &guimanager::setDestructiveActions);
     connect(editorWidget, &editorgui::setPlayingAudio, this, &guimanager::handleSetAudioPlayback);
@@ -63,6 +68,15 @@ guimanager::guimanager(QWidget *parent) : QMainWindow(parent) {
     // Disable actions that should only be enabled when project loaded;
     connect(editorWidget, &editorgui::updateMenuHistoryFile, menuWidget, &menugui::setupRecentFiles);
     setDestructiveActions(false);
+}
+
+/* CLOSE ACTION */
+
+void guimanager::closeEvent(QCloseEvent *event) {
+    if(isEdited) {
+        int wantsToGo = editorWidget->ADisplayAskSaveDlg();
+        if(!wantsToGo) event->ignore();
+    }
 }
 
 /* MENU BAR */
@@ -195,6 +209,10 @@ void guimanager::AAboutGUI() {
 void guimanager::handleEditorReady() {
     stackedWidget->setCurrentIndex(1);
     editorWidget->toggleActive();
+}
+
+void guimanager::handleSetEdited(const bool &state) {
+    isEdited = state;
 }
 
 void guimanager::handleSetWindowName(const QString &title) {

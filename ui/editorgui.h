@@ -27,6 +27,7 @@ public:
 
 signals:
     void editorReady();
+    void setEdited(const bool &state);
     void setWindowName(const QString &title);
     void setDestructive(const bool &state);
     void setPlayingAudio(const bool &state);
@@ -35,6 +36,7 @@ signals:
 public slots:
     void loadProject(QString file);
     // Main functions
+    int ADisplayAskSaveDlg();
     int ASaveProject();
     int ASaveAsProject();
     void ALoadProject();
@@ -79,7 +81,6 @@ private slots:
 
 private:
     Ui::editorgui *ui;
-    int displaySaveDlg();
     void importStageInfo();
     void afterProjLoad();
     void updateLog();
@@ -94,8 +95,6 @@ private:
     void setProjectWindowName();
 
 protected:
-    void closeEvent(QCloseEvent *event) override;
-
     /* Editor Keyboard Input */
     void keyPressEvent(QKeyEvent *event) override;
 };

@@ -6,7 +6,6 @@
 
 #include <QPushButton>
 #include <QMessageBox>
-#include <QCloseEvent>
 
 bool isEditorActive = false;
 bool isAudioPlaying = false;
@@ -15,7 +14,6 @@ bool oldProjectLimit = false;
 int cursorpos = 0;
 int cursorowner = 0;
 int precpos = 0;
-QString fileName;
 
 int numowners = 3;
 PLAYER_CODE owners[3] = {PLAYER_CODE::PCODE_TEACHER, PLAYER_CODE::PCODE_PARA, PLAYER_CODE::PCODE_BOXY};
@@ -75,6 +73,8 @@ editorgui::editorgui(QWidget *parent)
     this->setAttribute(Qt::WA_AlwaysShowToolTips, true);
     ui->variantInput->setMaximum(16);
 
+    connect(this, &editorgui::setEdited, this, [=, this](const bool &status) {hasEdited = status;});
+
     connect(ui->recordInput, QOverload<int>::of(&QSpinBox::valueChanged), this, [=, this]() {
         CurrentRecord = ui->recordInput->value();
         editorgui::drawEditorGUI();
@@ -115,14 +115,7 @@ void editorgui::toggleActive() {
     isEditorActive = !isEditorActive;
 }
 
-void editorgui::closeEvent(QCloseEvent *event) {
-    if(hasEdited) {
-        int wantsToGo = displaySaveDlg();
-        if(!wantsToGo) event->ignore();
-    }
-}
-
-int editorgui::displaySaveDlg() {
+int editorgui::ADisplayAskSaveDlg() {
     QMessageBox msgBox;
     msgBox.setWindowTitle("Unsaved Changes");
     msgBox.setIcon(QMessageBox::Warning);
@@ -133,7 +126,7 @@ int editorgui::displaySaveDlg() {
 
     switch(msgBox.exec()) {
     case QMessageBox::Save:
-        return ASaveAsProject();
+        return ASaveProject();
     case QMessageBox::Discard:
         return true;
     default:
@@ -191,7 +184,7 @@ void editorgui::keyPressEvent(QKeyEvent *event)
 void editorgui::loadProject(QString tmpFileName)
 {
     if(hasEdited) {
-        int wantsToGo = displaySaveDlg();
+        int wantsToGo = ADisplayAskSaveDlg();
         if(!wantsToGo) return;
     }
 
@@ -200,7 +193,7 @@ void editorgui::loadProject(QString tmpFileName)
 
     int result = neodata::LoadFromBes(tmpFileName);
     if(result == 0 || result == 254) {
-        hasEdited = false;
+        emit setEdited(false);
         emit updateMenuHistoryFile();
         afterProjLoad();
         drawEditorGUI();
@@ -225,13 +218,13 @@ void editorgui::ALoadProject()
 
 int editorgui::ASaveProject()
 {
-    if(fileName.isEmpty()) return editorgui::ASaveAsProject();
-    neodata::Log("Saving Project to: " + fileName);
+    if(ProjectInfo.fileName.isEmpty()) return editorgui::ASaveAsProject();
+    neodata::Log("Saving Project to: " + ProjectInfo.fileName);
 
-    int result = neodata::SaveToBes(fileName);
+    int result = neodata::SaveToBes(ProjectInfo.fileName);
     if(result == 0) {
         neodata::Log("Saved project file successfully.");
-        hasEdited = false;
+        emit setEdited(false);
     }
     else {
         QMessageBox::critical(this, "Error on project save", strerror(result));
@@ -259,7 +252,7 @@ int editorgui::ASaveAsProject()
         return 0;
     }
 
-    hasEdited = false;
+    emit setEdited(false);
     updateLog();
     return 1;
 }
@@ -269,7 +262,7 @@ int editorgui::ASaveAsProject()
 void editorgui::ADownloadEmu()
 {
     if(hasEdited) {
-        int wantsToGo = displaySaveDlg();
+        int wantsToGo = ADisplayAskSaveDlg();
         if(!wantsToGo) return;
     }
 
@@ -277,7 +270,7 @@ void editorgui::ADownloadEmu()
 
     switch(neodata::LoadFromEmu()) {
     case 0:
-        hasEdited = false;
+        emit setEdited(false);
         afterProjLoad();
         drawEditorGUI();
         break;
@@ -498,7 +491,7 @@ void editorgui::drawLineProperties() {
 }
 
 void editorgui::updateLineProperties(int row, int column) {
-    hasEdited = true;
+    emit setEdited(true);
     int32_t coolTres = ui->lineOptions->item(row,0)->text().toInt();
     Records[CurrentRecord].variants[MentionedVariant].lines[row].coolmodethreshold = coolTres;
 }
@@ -592,7 +585,7 @@ void editorgui::drawCommands() {
 }
 
 void editorgui::updateCommandProperties() {
-    hasEdited = true;
+    emit setEdited(true);
     int curComSel = ui->comSelector->currentIndex();
     int curCol = ui->comTable->currentColumn();
     int curRow = ui->comTable->currentRow();
@@ -675,7 +668,7 @@ void editorgui::handlePrecKeys(int inc) {
 }
 
 void editorgui::handleButtonKeys(int buttonId) {
-    hasEdited = true;
+    emit setEdited(true);
     if(buttonId == 0) AButtonDelete();
     else Records[CurrentRecord].variants[MentionedVariant].createButton((cursorpos * 24) + precpos, owners[cursorowner], buttonId);
 }
@@ -692,7 +685,7 @@ void editorgui::AButtonCut() {
 }
 
 void editorgui::AButtonDelete() {
-    hasEdited = true;
+    emit setEdited(true);
     Records[CurrentRecord].variants[MentionedVariant].deleteButton((cursorpos * 24) + precpos, owners[cursorowner]);
 }
 
@@ -707,17 +700,17 @@ void editorgui::AButtonPaste() {
 }
 
 void editorgui::ALineCreate() {
-    hasEdited = true;
+    emit setEdited(true);
     Records[CurrentRecord].variants[MentionedVariant].createLine(cursorpos * 24, (cursorpos * 24) + 24, owners[cursorowner]);
 }
 
 void editorgui::ALineDelete() {
-    hasEdited = true;
+    emit setEdited(true);
     Records[CurrentRecord].variants[MentionedVariant].deleteLine(cursorpos * 24, owners[cursorowner]);
 }
 
 void editorgui::ACommandCreate() {
-    hasEdited = true;
+    emit setEdited(true);
     int curComSel = ui->comSelector->currentIndex();
     int curRow = ui->comTable->currentRow();
     commandbuffer_t newCom;
@@ -732,7 +725,7 @@ void editorgui::ACommandCreate() {
 }
 
 void editorgui::ACommandDelete() {
-    hasEdited = true;
+    emit setEdited(true);
     int curComSel = ui->comSelector->currentIndex();
     int curRow = ui->comTable->currentRow();
 
@@ -756,7 +749,7 @@ void editorgui::ALinkVariant(bool linkAll)
         return;
     }
 
-    hasEdited = true;
+    emit setEdited(true);
     if(linkAll) {
         for(int i = 0; i < 17; i++) {
             if(i != linkId) Records[CurrentRecord].variants[i].setLink(linkId);
@@ -781,7 +774,7 @@ void editorgui::ASetSoundboard()
         return;
     }
 
-    hasEdited = true;
+    emit setEdited(true);
     Records[CurrentRecord].soundboardid = sbId;
     audio->loadSoundDB(Records[CurrentRecord].soundboardid - 1);
 }

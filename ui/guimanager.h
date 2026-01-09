@@ -19,6 +19,7 @@ public:
 
 public slots:
     void handleEditorReady();
+    void handleSetEdited(const bool &state);
     void handleSetWindowName(const QString &title);
     void handleSetAudioPlayback(const bool &state);
     void setDestructiveActions(const bool &state);
@@ -49,6 +50,7 @@ private:
     QAction *actionChangeMenu, *actionSettings, *actionAbout;
 
 protected:
+    void closeEvent(QCloseEvent *event) override;
     void dragEnterEvent(QDragEnterEvent *event) override;
     void dragMoveEvent(QDragMoveEvent *event) override;
     void dragLeaveEvent(QDragLeaveEvent *event) override;
