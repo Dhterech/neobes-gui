@@ -172,7 +172,7 @@ These commands are executed when the main command is [`0x09` (`SCRRJ_SUBJOB`)](#
     * `JobD2`: Sound Number
 * **Description:**
     Triggers a sound effect via the SPU (Sound Processing Unit). Calls `ScrTapReq`.
-    *(Note: SPU_ON2, ON3, and ON4 share this logic logic).*
+    *(Note: SPU_ON2, ON3, and ON4 share this logic).*
 
 ### 0x0A: SCRSUBJ_TITLE
 * **Arguments:**
