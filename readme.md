@@ -1,59 +1,59 @@
-# NeoBES
-### The Definitive PaRappa the Rapper 2 Button Editing Software
+# NeoBES <img src="res/neobes.ico" align="right" width="120" height="120" >
 
-NeoBES is a powerful tool designed for loading, creating, and modifying stage mods for PaRappa the Rapper 2 (PlayStation 2). Built upon ptr2besms and neobesms, NeoBES features a completely overhauled interface and more robust editing tools.
+**The Definitive PaRappa the Rapper 2 Button Editing Software.**
 
-## Key Features
+NeoBES is a native tool for loading, creating, and modifying stage mods for *PaRappa the Rapper 2* (PS2) via PCSX2 and PINE. It features an overhauled interface, improved timing logic, and legacy file repair.
 
- - Native builds for Windows and Linux.
- - Works on the new PCSX2 build using PINE.
- - Improved logic for previewing and timing button placements.
- - Automatically fixes corrupted or missing scene job data from older tools.
+---
 
-## Compatibility & Requirements
-### Emulator
-- PCSX2: Requires a recent version with PINE support enabled on Advanced Settings.
-- Note on Linux: The Flatpak version of PCSX2 is currently not supported as it sandboxes the PINE interface, preventing NeoBES from communicating with the emulator. Use the AppImage or native package to your distro instead.
+## 1. Compatibility
 
-### Game Versions
-- NTSC-U (North America)
-- NTSC-J (Japan)
-- PAL (Europe)
+### System Requirements
+*   **OS:** Windows or Linux, or really any other plataform that can compile QT.
+*   **Emulator:** PCSX2 (Recent build).
+    *   *Note:* Linux Flatpak versions are **not supported** due to PINE sandbox restrictions. Use AppImage or native packages.
+*   **PINE:** Must be enabled in PCSX2 Advanced Settings.
 
-### Save Files & Older Tools Support
+### Supported Game Versions
+*   NTSC-U (North America)
+*   NTSC-J (Japan)
+*   PAL (Europe)
 
-NeoBES is compatible with mods created in ptr2besms or neobesms. However, those tools produced files with missing or unordered "scene job" data, which could lead to crashes.
+### Legacy File Support
+NeoBES supports files from `ptr2besms` and `neobesms`.
+*   **Auto-Fix:** Corrupted/missing scene jobs in legacy files are repaired during upload.
+*   **Warning:** Do **not** modify scene jobs or reorder records on legacy files before the first successful sync/save, or data corruption may occur.
 
-#### Important Usage Tips for Legacy Files:
-- Auto-Fixing: NeoBES repairs these files during the upload process by recreating the scene jobs and loading missing records.
-- Do NOT modify scene jobs before your first successful upload/sync. Once synced and saved via NeoBES, the necessary data will be added.
-- That old file type doesn't support reordering records, so don't save the project if you changed it to avoid corrupting your mod.
-- A new, more robust file format is currently in development.
+---
 
-## How to Use
-- Launch PCSX2 and ensure PINE is enabled in Advanced Settings.
-- Start the game and navigate to a stage.
-- Pause the game at the "Try Again" screen.
-- Open NeoBES.
-- Either create a new mod by downloading the current data from PCSX2 or load an existing file.
-- Modify the buttons/lines and save your changes as desired.
-- Select the option in the NeoBES menu to upload the mod back to PCSX2.
-- Unpause the game and enjoy your mod!
+## 2. Usage
 
-## Keybindings 
+1.  **Launch PCSX2**: Ensure **PINE** is enabled (`Settings > Advanced`).
+2.  **Start Game**: Load any region of *PaRappa the Rapper 2* and enter the desired stage.
+3.  **Pause**: Pause the game in the **"Try Again"** screen.
+4.  **Open NeoBES**:
+    *   **New**: Download current stage data from PCSX2.
+    *   **Load**: Open an existing mod file.
+5.  **Edit**: Modify lines and buttons.
+6.  **Sync**: Select **Upload** in NeoBES.
+7.  **Play**: Unpause the game to test changes.
 
-NeoBES utilizes a mix of keyboard and mouse keybindings, most of the keyboard's actions are similar to older besms tools.
+---
 
-| Action | Key(s) |
-| :--- | :--- |
-| **Navigate Timeline** | `W` `A` `S` `D` |
-| **Precision Navigation** | `Q` / `E` |
-| **Place Button (1-6)** | `1`, `2`, `3`, `4`, `5`, `6` |
-| **Delete Button** | `0` |
-| **Create Line** | `Space` |
-| **Delete Line** | `Backspace` |
-| **Resize/Extend Line** | `,` / `.` |
-| **Move Line** | `N` / `M` |
-| **Clipboard** | `X` (Cut) / `C` (Copy) / `V` (Paste) |
+## 3. Controls
 
+| Context | Action | Input |
+| :--- | :--- | :--- |
+| **Navigation** | Timeline Scroll | `W` `A` `S` `D` |
+| | Precision Scroll | `Q` / `E` |
+| **Editing** | Place Input (1-6) | `1` - `6` |
+| | Delete Input | `0` |
+| **Lines** | Create Line | `Space` |
+| | Delete Line | `Backspace` |
+| | Resize Line | `,` / `.` |
+| | Move Line | `N` / `M` |
+| **Clipboard** | Cut / Copy / Paste | `X` / `C` / `V` |
 
+## 4. Documentation
+
+For technical details regarding file structures, and internal game logic, refer to the documentation located in the `docs/` directory.
