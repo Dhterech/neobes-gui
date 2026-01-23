@@ -269,17 +269,20 @@ These commands are executed when the main command is [`0x09` (`SCRRJ_SUBJOB`)](#
 *   `8`: Game Over
 
 ### Setup Icons (`GUI_CURSOR_ENUM`)
-*   `0`: None
+*   `0`: Nothing
 *   `1`: PaRappa
-*   `2`: Boxy Boy
-*   `3`: Stage 1 (Onion)
-*   `4`: Stage 2 (Mooselini)
-*   `5`: Stage 3 (Frog)
-*   `6`: Stage 4 (Chicken)
-*   `7`: Stage 5 (Toilet)
-*   `8`: Stage 6 (Hairdresser)
-*   `9`: Stage 7 (Noodle)
-*   `10`: Stage 8 (Mushi)
+*   `2`: Boxxy
+*   `3`: Beard B.
+*   `4`: Master Onion
+*   `5`: Ant
+*   `6`: Sister Moosesha
+*   `7`: Takoyama
+*   `8`: Takoyama
+*   `9`: Colonel Noodle
+*   `10`: Mushi
+*   `11`: White fog
+*   `12`: Orange line
+*   `13`: Blue line
 
 ### Exams (`EXAM_ENUM`)
 *   `0`: None
