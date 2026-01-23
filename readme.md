@@ -56,4 +56,6 @@ NeoBES utilizes a mix of keyboard and mouse keybindings, most of the keyboard's 
 | **Move Line** | `N` / `M` |
 | **Clipboard** | `X` (Cut) / `C` (Copy) / `V` (Paste) |
 
+## 4. Documentation
 
+For technical details regarding file structures, and internal game logic, refer to the documentation located in the `docs/` directory.
